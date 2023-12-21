@@ -1,0 +1,18 @@
+/*!********************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[11].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[11].oneOf[7].use[3]!./app/Room/Room.module.css ***!
+  \********************************************************************************************************************************************************************************************************************************************************************/
+.Room_main__q_hMQ {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  
+  .Room_roomBtns__TNNpL {
+    display: flex;
+    gap:55px;
+    flex-direction: row;
+    cursor: pointer;
+  }
+  

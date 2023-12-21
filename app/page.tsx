@@ -1,6 +1,7 @@
+"use client"
+
 import React from 'react';
 import { Box, Text, Button, Link } from '@chakra-ui/react';
-
 
 const Page = () => {
   return (
@@ -22,6 +23,7 @@ const Page = () => {
         Doodler
       </Text>
 
+      <Link href="/Room" textDecoration="none">
       <Button
         width="200px"
         height="50px"
@@ -35,6 +37,7 @@ const Page = () => {
       >
         Let's Doodle
       </Button>
+      </Link>
     </Box>
   );
 };

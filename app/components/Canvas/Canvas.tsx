@@ -13,6 +13,13 @@ const Canvas = () => {
     colorPicker.addEventListener('change', (e) => {
         setColor(colorPicker.value);
     })
+
+    return () => {
+      colorPicker.removeEventListener("change", (e)=>{
+        setColor(colorPicker.value);
+      });
+    };
+    
   }, []);
 
   function drawLine({prevPoint, currentPoint, ctx} : Draw) {
