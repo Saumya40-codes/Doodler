@@ -4,10 +4,21 @@ import React, { useState } from 'react'
 import styles from './Room.module.css'
 import EnterCode from '../components/EnterCode/EnterCode'
 import { Button } from '@chakra-ui/react'
+import { nanoid } from 'nanoid'
 
 const Room = () => {
   const [roomCode, setRoomCode] = useState<string>('');
   const [clickJoin, setClickJoin] = useState<boolean>(false);
+
+  function generateRoomCode() {
+    const newRoomCode = nanoid(6);
+    setRoomCode(newRoomCode);
+  }
+  
+  const handleNew = async() => {
+    generateRoomCode();
+    console.log(roomCode);
+  }
 
   return (
     <div className={styles.main}>
@@ -38,7 +49,7 @@ const Room = () => {
         )}
       </div>
       <div className={styles.roomBtns}>
-        <Button
+        <Button 
           colorScheme="teal"
           variant="outline"
           size="lg"
@@ -47,7 +58,7 @@ const Room = () => {
           Enter Code
         </Button>
 
-        <Button colorScheme="teal" variant="outline" size="lg">
+        <Button colorScheme="teal" variant="outline" size="lg"  onClick={handleNew}>
           Create Room
         </Button>
       </div>
