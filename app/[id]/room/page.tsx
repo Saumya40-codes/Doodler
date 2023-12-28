@@ -2,6 +2,7 @@
 
 import React from 'react'
 import {useParams} from 'next/navigation'
+import Canvas from '@/app/components/Canvas/Canvas'
 
 const page = () => {
 
@@ -10,6 +11,8 @@ const page = () => {
   return (
     <div>
       hello {id}
+
+      <Canvas />
     </div>
   )
 }

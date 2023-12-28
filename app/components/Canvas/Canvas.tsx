@@ -47,7 +47,7 @@ const Canvas = () => {
   }
 
   return (
-    <div className="w-screen h-screen bg-white flex justify-center items-center">
+    <div className="w-screen h-screen flex justify-center items-center">
       <div className="block  flex-col items-center">
       <label htmlFor="color-picker">Select a color:</label>
       <input id="color-picker" type="color" />
