@@ -1,17 +1,27 @@
-import React from 'react'
-import { Input, InputGroup, InputLeftAddon, Stack } from '@chakra-ui/react'
+import React from 'react';
+import { Input, InputGroup, InputLeftAddon, Stack } from '@chakra-ui/react';
+import styles from './EnterCode.module.css';
 
-const EnterCode = () => {
+interface EnterCodeProps {
+  text: string;
+  onChange: (value: string) => void;
+}
+
+const EnterCode: React.FC<EnterCodeProps> = ({ text, onChange }) => {
   return (
-    <div>
+    <div className={styles.btns}>
       <Stack spacing={4}>
         <InputGroup>
-        <InputLeftAddon children='code' />
-        <Input type='tel' placeholder='Enter code' />
+          <InputLeftAddon children={text.includes('name') ? 'name' : 'code'} />
+          <Input
+            type="tel"
+            placeholder={text}
+            onChange={(e:React.ChangeEvent<HTMLInputElement>) => onChange(e.target?.value)}
+          />
         </InputGroup>
       </Stack>
     </div>
-  )
-}
+  );
+};
 
-export default EnterCode
+export default EnterCode;

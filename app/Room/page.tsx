@@ -8,7 +8,9 @@ import { nanoid } from 'nanoid'
 
 const Room = () => {
   const [roomCode, setRoomCode] = useState<string>('');
+  const [roomOwner, setRoomOwner] = useState<string>('');
   const [clickJoin, setClickJoin] = useState<boolean>(false);
+  const [clickCreate, setClickCreate] = useState<boolean>(false);
 
   function generateRoomCode() {
     const newRoomCode = nanoid(6);
@@ -16,8 +18,25 @@ const Room = () => {
   }
   
   const handleNew = async() => {
+    console.log('new room');
     generateRoomCode();
-    console.log(roomCode);
+    
+    const data = {
+      id: 'some-id',
+      owner: 'some-owner',
+      members: ['member1', 'member2']
+    };
+    
+    const res = await fetch('/api/room/newroom', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+    console.log(result);
   }
 
   return (
@@ -25,7 +44,14 @@ const Room = () => {
       <div className={ clickJoin ?styles.overlay:''}>
         {clickJoin &&(
           <div className={styles.enterCodeContainer}>
-          <EnterCode />
+          <EnterCode 
+          text="Enter name"
+          onChange={(val) => setRoomOwner(val)}
+          />
+          {!clickCreate && <EnterCode  
+          text="Enter code" 
+          onChange={(val) => setRoomCode(val)}
+          />}
           <div className='flex justify-center'>
           <Button
             colorScheme="teal"
@@ -53,12 +79,18 @@ const Room = () => {
           colorScheme="teal"
           variant="outline"
           size="lg"
-          onClick={() => setClickJoin((prevClickJoin) => !prevClickJoin)}
+          onClick={() => {
+            setClickJoin((prevClickJoin) => !prevClickJoin);
+            setClickCreate(false);
+          }}
         >
           Enter Code
         </Button>
 
-        <Button colorScheme="teal" variant="outline" size="lg"  onClick={handleNew}>
+        <Button colorScheme="teal" variant="outline" size="lg"  onClick={()=>{
+            setClickJoin((prevClickJoin) => !prevClickJoin);
+            setClickCreate((prevClickCreate) => !prevClickCreate);
+        }}>
           Create Room
         </Button>
       </div>
