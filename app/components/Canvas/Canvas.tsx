@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useDraw } from "@/hooks/useDraw";
-import CloseBtn from "../CloseBtn/CloseBtn";
+import { drawLine } from "@/utils/drawLine";
+
+import { io } from "socket.io-client";
+const socket = io("http://localhost:5000");
 
 const Canvas = () => {
   const[color,setColor] = useState('#000')
-  const { canvasRef, onMouseDown, clear} = useDraw(drawLine);
+  const { canvasRef, onMouseDown, clear} = useDraw(createLine);
 
   useEffect(() => {
     const colorPicker = document.getElementById('color-picker') as HTMLInputElement;
@@ -19,31 +22,48 @@ const Canvas = () => {
         setColor(colorPicker.value);
       });
     };
-    
   }, []);
 
-  function drawLine({prevPoint, currentPoint, ctx} : Draw) {
-    const {x: currX, y: currY} = currentPoint;
+  useEffect(() => {
 
-    const lineColor = color;
-    const lineWidth = 5
+    const ctx = canvasRef.current?.getContext("2d");
 
-    let startPoint = prevPoint ?? currentPoint;
-    ctx.beginPath();
+    socket.emit('new-client');
 
-    ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = lineColor;
+    socket.on('get-canvas-state',()=>{
+      if(!canvasRef.current?.toDataURL) return;
 
-    ctx.moveTo(startPoint.x, startPoint.y);
-    ctx.lineTo(currX, currY);
-    ctx.stroke();
+      socket.emit('canvas-state',canvasRef.current.toDataURL());
+    });
 
-    ctx.fillStyle = lineColor;
-    ctx.beginPath();
+    socket.on('canvas-state-from-server',(image)=>{
+      if(!ctx) return;
+      const canvasImage = new Image();
+      canvasImage.src = image;
+      canvasImage.onload = () => {
+        ctx.drawImage(canvasImage,0,0);
+      }
+    });
 
-    ctx.arc(startPoint.x, startPoint.y, 2, 0, Math.PI * 2, true);
-    ctx.fill();
-    ctx.closePath();
+    socket.on('draw-line',({prevPoint, currentPoint, color}: DrawLineProps) => {
+      if(!ctx) return;
+      drawLine({prevPoint, currentPoint, ctx, color});
+    });
+
+    socket.on('clear',clear);
+
+    return () => {
+      socket.off('get-canvas-state');
+      socket.off('canvas-state-from-server');
+      socket.off('draw-line');
+      socket.off('clear');
+    };
+
+  },[canvasRef]);
+
+  function createLine({prevPoint, currentPoint, ctx} : Draw) {
+    socket.emit('draw-line',{prevPoint, currentPoint, color});
+    drawLine({prevPoint, currentPoint, ctx, color});
   }
 
   return (
@@ -52,7 +72,9 @@ const Canvas = () => {
       <label htmlFor="color-picker">Select a color:</label>
       <input id="color-picker" type="color" />
       </div>
-        <CloseBtn clear={clear} />
+        <button className="border border-black rounded-md px-2 py-1" onClick={()=> socket.emit('clear')}>
+          Clear
+        </button>
       <canvas
         onMouseDown={onMouseDown}
         ref={canvasRef}

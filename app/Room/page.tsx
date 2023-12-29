@@ -6,6 +6,9 @@ import EnterCode from '../components/EnterCode/EnterCode';
 import { Button } from '@chakra-ui/react';
 import { nanoid } from 'nanoid';
 import Toast from '../components/Toast/toast';
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:5000');
 
 const Room = () => {
   const [roomCode, setRoomCode] = useState<string>('');

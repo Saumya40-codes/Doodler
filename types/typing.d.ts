@@ -8,3 +8,7 @@ type Point = {
     x: number;
     y: number;
 }
+
+type DrawLineProps = Draw & {
+    color: string;
+}
