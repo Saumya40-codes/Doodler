@@ -1,10 +1,9 @@
 {
   "pages": {
-    "/Room/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/Room/page.css",
-      "static/chunks/app/Room/page.js"
+      "static/chunks/app/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -12,15 +11,11 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/page": [
+    "/Room/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
-    ],
-    "/[id]/room/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/[id]/room/page.js"
+      "static/css/app/Room/page.css",
+      "static/chunks/app/Room/page.js"
     ]
   }
 }

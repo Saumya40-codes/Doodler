@@ -5,12 +5,14 @@ import styles from './Room.module.css';
 import EnterCode from '../components/EnterCode/EnterCode';
 import { Button } from '@chakra-ui/react';
 import { nanoid } from 'nanoid';
+import Toast from '../components/Toast/toast';
 
 const Room = () => {
   const [roomCode, setRoomCode] = useState<string>('');
   const [roomOwner, setRoomOwner] = useState<string>('');
   const [clickJoin, setClickJoin] = useState<boolean>(false);
   const [clickCreate, setClickCreate] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');  
 
   const generateRoomCode = () => {
     const newRoomCode = nanoid(6);
@@ -19,15 +21,12 @@ const Room = () => {
   };
 
   const handleNew = async () => {
-    console.log('new room');
     const generatedRoomCode = generateRoomCode();
 
     const data = {
       id: generatedRoomCode,
       owner: roomOwner,
     };
-
-    console.log(data);
 
     const res = await fetch('/api/room/newroom', {
       method: 'POST',
@@ -42,8 +41,7 @@ const Room = () => {
       window.location.href = `/${generatedRoomCode}/room`;
     }
     else{
-      setClickJoin(false);
-      setClickCreate(false);
+      setError('Internal server error');
     }
   };
 
@@ -68,14 +66,14 @@ const Room = () => {
     if(result.status === 200){
       window.location.href = `/${roomCode}/room`;
     }
-    else{
-      setClickJoin(false);
-      setClickCreate(false);
+    else if(result.status === 404){
+      setError('Room not found');
     }
   }
 
   return (
     <div className={styles.main}>
+      {error !== '' && <Toast status="error" text={error} />}
       <div className={clickJoin ? styles.overlay : ''}>
         {clickJoin && (
           <div className={styles.enterCodeContainer}>
@@ -104,7 +102,10 @@ const Room = () => {
                 variant="outline"
                 size="sm"
                 className={styles.otherBtn}
-                onClick={clickCreate ? handleNew : handleJoin}
+                onClick={()=>{
+                  setError('');
+                  clickCreate ? handleNew() : handleJoin();
+                }}
               >
                 Join
               </Button>
