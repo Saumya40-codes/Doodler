@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     try{
         await connectToDB();
 
-        const { id } = await request.json();
+        const { id, user } = await request.json();
 
         if(!id) {
             return NextResponse.json({ message: "Invalid request" });
@@ -18,6 +18,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ message: "Room not found", status: 404 });
         }
 
+        room.members.push(user);
+
+        await room.save();
         return NextResponse.json({ room, status: 200 });
     }
     catch(err) {

@@ -21,5 +21,4 @@ export const connectToDB = async () => {
     catch(err) {
         console.log(err);
     }
-
 }

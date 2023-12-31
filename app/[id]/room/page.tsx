@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Canvas from '@/app/components/Canvas/Canvas';
+import socket from '@/utils/socket';
 
 const Page = () => {
   const { id } = useParams();

@@ -6,14 +6,14 @@ export async function POST(request: Request) {
     try {
         await connectToDB();
 
-        const { id, owner } = await request.json();
+        const { id, owner, members } = await request.json();
 
-        if (!id || !owner) {
+        if (!id || !owner || !members) {
             return NextResponse.json({ message: "Invalid request" });
         }
         // console.log(id, owner, members);
 
-        const room = new Room({ id, owner });
+        const room = new Room({ id, owner, members});
         await room.save();
         return NextResponse.json({ message: "Room created" });
     } catch (err) {

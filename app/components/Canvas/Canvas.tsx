@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useDraw } from "@/hooks/useDraw";
 import { drawLine } from "@/utils/drawLine";
 import socket from "@/utils/socket";
@@ -56,6 +56,10 @@ const Canvas = ({roomId}:{roomId:string}) => {
 
     socket.on('clear', clear);
 
+    socket.on('user-disconnected', (username) => {
+      console.log(`${username} has left the room`);
+    });
+
     return () => {
         socket.off('user-connected');
         socket.off('get-canvas-state');
@@ -64,7 +68,8 @@ const Canvas = ({roomId}:{roomId:string}) => {
         socket.off('clear');
     };
 
-}, [canvasRef, roomId]);
+}, [canvasRef]);
+  
 
   function createLine({prevPoint, currentPoint, ctx} : Draw) {
     socket.emit('draw-line',{prevPoint, currentPoint, color,roomId});

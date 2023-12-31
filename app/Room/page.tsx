@@ -27,6 +27,7 @@ const Room = () => {
     const data = {
       id: generatedRoomCode,
       owner: user,
+      members: [user],
     };
 
     const res = await fetch('/api/room/newroom', {
@@ -40,6 +41,7 @@ const Room = () => {
     const result = await res.json();
     if(result.message === 'Room created'){
       localStorage.setItem('user',user);
+      localStorage.setItem('room',generatedRoomCode);
       window.location.href = `/${generatedRoomCode}/room`;
     }
     else{
@@ -52,7 +54,7 @@ const Room = () => {
       return;
     }
 
-    const data = {id:roomCode};
+    const data = {id:roomCode, user};
 
     const res = await fetch('/api/room/joinroom',{
       method:'POST',
@@ -67,6 +69,7 @@ const Room = () => {
 
     if(result.status === 200){
       localStorage.setItem('user',user);
+      localStorage.setItem('room',roomCode);
       window.location.href = `/${roomCode}/room`;
     }
     else if(result.status === 404){
