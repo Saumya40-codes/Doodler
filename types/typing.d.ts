@@ -11,4 +11,5 @@ type Point = {
 
 type DrawLineProps = Draw & {
     color: string;
+    roomId: string;
 }

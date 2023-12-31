@@ -8,7 +8,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         origin: "http://localhost:3000",
-        methods: ["GET", "POST"]
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     }
 }); 
 
@@ -21,30 +21,32 @@ interface DrawLine{
     prevPoint: Point | null,
     currentPoint: Point,
     color: string,
+    roomId: string
 }
 
-io.on('connection',(socket)=>{
+io.on('connection', (socket) => {
 
-    socket.on('new-client',()=>{
-        socket.broadcast.emit('get-canvas-state');
+    socket.on('new-client', (roomId: string) => {
+        io.to(roomId).emit('get-canvas-state');
     });
 
-    socket.on('join-room',(roomId:string,username:string)=>{
+    socket.on('join-room', (roomId: string, username: string) => {
         socket.join(roomId);
-        socket.broadcast.to(roomId).emit('user-connected',username);
+
+        io.to(roomId).emit('user-connected', username);
     });
 
-    socket.on('draw-line',({prevPoint,currentPoint,color}:DrawLine)=>{
-        socket.broadcast.emit('draw-line',{prevPoint,currentPoint,color});
-    })
-
-    socket.on('canvas-state',(canvasState:string)=>{
-        socket.broadcast.emit('canvas-state-from-server',canvasState);
+    socket.on('draw-line', ({ prevPoint, currentPoint, color, roomId }: DrawLine) => {
+        socket.broadcast.to(roomId).emit('draw-line', { prevPoint, currentPoint, color });
     });
 
-    socket.on('clear',()=>{
-        io.emit('clear');
-    })
+    socket.on('canvas-state', ({canvasState,roomId}) => {
+        io.to(roomId).emit('canvas-state-from-server', canvasState);
+    });
+
+    socket.on('clear', (roomId: string) => {
+        io.to(roomId).emit('clear');
+    });
 });
 
 server.listen(5000,()=>{

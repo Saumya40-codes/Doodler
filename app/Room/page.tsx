@@ -6,13 +6,11 @@ import EnterCode from '../components/EnterCode/EnterCode';
 import { Button } from '@chakra-ui/react';
 import { nanoid } from 'nanoid';
 import Toast from '../components/Toast/toast';
-import { io } from 'socket.io-client';
-
-const socket = io('http://localhost:5000');
+import socket from '@/utils/socket';
 
 const Room = () => {
   const [roomCode, setRoomCode] = useState<string>('');
-  const [roomOwner, setRoomOwner] = useState<string>('');
+  const [user, setUser] = useState<string>('');
   const [clickJoin, setClickJoin] = useState<boolean>(false);
   const [clickCreate, setClickCreate] = useState<boolean>(false);
   const [error, setError] = useState<string>('');  
@@ -28,7 +26,7 @@ const Room = () => {
 
     const data = {
       id: generatedRoomCode,
-      owner: roomOwner,
+      owner: user,
     };
 
     const res = await fetch('/api/room/newroom', {
@@ -41,6 +39,7 @@ const Room = () => {
 
     const result = await res.json();
     if(result.message === 'Room created'){
+      localStorage.setItem('user',user);
       window.location.href = `/${generatedRoomCode}/room`;
     }
     else{
@@ -67,6 +66,7 @@ const Room = () => {
     console.log(result)
 
     if(result.status === 200){
+      localStorage.setItem('user',user);
       window.location.href = `/${roomCode}/room`;
     }
     else if(result.status === 404){
@@ -82,7 +82,7 @@ const Room = () => {
           <div className={styles.enterCodeContainer}>
             <EnterCode
               text="Enter name"
-              onChange={(val) => setRoomOwner(val)}
+              onChange={(val) => setUser(val)}
             />
             {!clickCreate && (
               <EnterCode

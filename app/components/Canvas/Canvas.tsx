@@ -3,11 +3,9 @@
 import { useEffect, useState } from "react";
 import { useDraw } from "@/hooks/useDraw";
 import { drawLine } from "@/utils/drawLine";
+import socket from "@/utils/socket";
 
-import { io } from "socket.io-client";
-const socket = io("http://localhost:5000");
-
-const Canvas = () => {
+const Canvas = ({roomId}:{roomId:string}) => {
   const[color,setColor] = useState('#000')
   const { canvasRef, onMouseDown, clear} = useDraw(createLine);
 
@@ -25,44 +23,51 @@ const Canvas = () => {
   }, []);
 
   useEffect(() => {
-
     const ctx = canvasRef.current?.getContext("2d");
 
-    socket.emit('new-client');
+    const user = localStorage.getItem('user');
 
-    socket.on('get-canvas-state',()=>{
-      if(!canvasRef.current?.toDataURL) return;
+    if(user) socket.emit('join-room', roomId, user);
 
-      socket.emit('canvas-state',canvasRef.current.toDataURL());
+    socket.on('user-connected', (username) => {
+      console.log(username, 'connected');
     });
 
-    socket.on('canvas-state-from-server',(image)=>{
-      if(!ctx) return;
-      const canvasImage = new Image();
-      canvasImage.src = image;
-      canvasImage.onload = () => {
-        ctx.drawImage(canvasImage,0,0);
-      }
+    socket.emit('new-client', roomId);
+
+    socket.on('get-canvas-state', () => {
+        if (!canvasRef.current?.toDataURL) return;
+        socket.emit('canvas-state', {canvasState: canvasRef.current?.toDataURL(),roomId});
     });
 
-    socket.on('draw-line',({prevPoint, currentPoint, color}: DrawLineProps) => {
-      if(!ctx) return;
-      drawLine({prevPoint, currentPoint, ctx, color});
+    socket.on('canvas-state-from-server', (image) => {
+        if (!ctx) return;
+        const canvasImage = new Image();
+        canvasImage.src = image;
+        canvasImage.onload = () => {
+            ctx.drawImage(canvasImage, 0, 0);
+        }
     });
 
-    socket.on('clear',clear);
+    socket.on('draw-line', ({ prevPoint, currentPoint, color }: DrawLineProps) => {
+        if (!ctx) return;
+        drawLine({ prevPoint, currentPoint, ctx, color });
+    });
+
+    socket.on('clear', clear);
 
     return () => {
-      socket.off('get-canvas-state');
-      socket.off('canvas-state-from-server');
-      socket.off('draw-line');
-      socket.off('clear');
+        socket.off('user-connected');
+        socket.off('get-canvas-state');
+        socket.off('canvas-state-from-server');
+        socket.off('draw-line');
+        socket.off('clear');
     };
 
-  },[canvasRef]);
+}, [canvasRef, roomId]);
 
   function createLine({prevPoint, currentPoint, ctx} : Draw) {
-    socket.emit('draw-line',{prevPoint, currentPoint, color});
+    socket.emit('draw-line',{prevPoint, currentPoint, color,roomId});
     drawLine({prevPoint, currentPoint, ctx, color});
   }
 
@@ -72,7 +77,7 @@ const Canvas = () => {
       <label htmlFor="color-picker">Select a color:</label>
       <input id="color-picker" type="color" />
       </div>
-        <button className="border border-black rounded-md px-2 py-1" onClick={()=> socket.emit('clear')}>
+        <button className="border border-black rounded-md px-2 py-1" onClick={()=> socket.emit('clear',roomId)}>
           Clear
         </button>
       <canvas

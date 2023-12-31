@@ -1,20 +1,29 @@
 "use client"
 
-import React from 'react'
-import {useParams} from 'next/navigation'
-import Canvas from '@/app/components/Canvas/Canvas'
+import React, { useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import Canvas from '@/app/components/Canvas/Canvas';
 
-const page = () => {
+const Page = () => {
+  const { id } = useParams();
+  const [user, setUser] = React.useState<string | null>(null);
 
-    const {id} = useParams();
+  useEffect(() => {
+    
+    const getUser = async() =>{
+      const storedUser = await localStorage.getItem('user');
+      setUser(storedUser);
+    }
+
+    getUser();
+  }, [user]); 
 
   return (
     <div>
       hello {id}
-
-      <Canvas />
+      <Canvas roomId={id as string}/>
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default Page;
