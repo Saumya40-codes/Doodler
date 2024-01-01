@@ -1,5 +1,5 @@
 .member{
-    width:186px;
+    width:200px;
     margin: 10px;
     display: flex;
     justify-content: center;
@@ -12,4 +12,9 @@
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
+}
+
+.bx{
+    width: 190px;
+    padding: 0px 15px 0px 15px;
 }

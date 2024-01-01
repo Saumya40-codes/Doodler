@@ -6,6 +6,7 @@ import Canvas from '@/app/components/Canvas/Canvas';
 import socket from '@/utils/socket';
 import styles from './room.module.css'
 import Memberlist from '@/app/components/MemberList/Memberlist';
+import Chat from '@/app/components/Chat/Chat';
 
 const Page = () => {
   const { id } = useParams();
@@ -28,6 +29,9 @@ const Page = () => {
       </div>
       <div className={styles.canvas}>
         <Canvas roomId={id as string}/>
+      </div>
+      <div className={styles.chat}>
+        <Chat roomId={id as string}/>
       </div>
     </div>
   );

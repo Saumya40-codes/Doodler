@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { useDraw } from "@/hooks/useDraw";
 import { drawLine } from "@/utils/drawLine";
 import socket from "@/utils/socket";
+import { EditIcon } from "@chakra-ui/icons";
 
 const Canvas = ({ roomId }: { roomId: string }) => {
   const [color, setColor] = useState("#000");
   const { canvasRef, onMouseDown, clear } = useDraw(createLine);
+  const [canDraw, setCanDraw] = useState<boolean>(false);
 
   useEffect(() => {
     const colorPicker = document.getElementById('color-picker') as HTMLInputElement;

@@ -1,0 +1,14 @@
+.mainchat{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.inp{
+    width:380px;
+    height: 35px;
+    border-radius: 2.5px;
+    text-align: center;
+}

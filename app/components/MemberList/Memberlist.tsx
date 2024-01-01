@@ -56,7 +56,7 @@ const Memberlist = ({ roomId }: { roomId: string }) => {
         {members && members?.map((member,index) => (
         <Card className={styles.member} key={index}>
             <CardBody>
-                <Text fontSize="md" fontWeight="bold" color="teal.400" alignContent='center'>{member}</Text>
+                <Text fontSize="md" fontWeight="bold" color="teal.400" alignContent='center' className={styles.bx}>{member}</Text>
             </CardBody>
         </Card>
         ))}
