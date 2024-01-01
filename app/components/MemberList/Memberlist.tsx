@@ -13,12 +13,18 @@ const Memberlist = ({ roomId }: { roomId: string }) => {
 
     useEffect(() => {
         socket.on('user-disconnected', () => {
+            console.log('user-disconnected');
             getMembers();
         });
 
         socket.on('user-connected', () => {
             getMembers();
         });
+
+        return () => {
+            socket.off('user-disconnected');
+            socket.off('user-connected');
+        }
 
     }, []);
 

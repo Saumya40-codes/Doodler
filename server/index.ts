@@ -45,13 +45,17 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('clear');
     });
 
-    socket.on('disconnect', ()=>{
-        const {roomId,username} = socket.handshake.query as {roomId:string,username:string};
-                
-        if (roomId && username) {
-            leaveRoom(roomId, username);
+    socket.on('disconnect', async () => {
+        const { roomId, username } = socket.handshake.query as { roomId: string, username: string };
+    
+        try {
+            if (roomId && username) {
+                await leaveRoom(roomId, username);
+    
+                socket.broadcast.to(roomId).emit('user-disconnected');
+            }
+        } catch (error) {
+            console.error(error);
         }
-
-        socket.broadcast.to(roomId).emit('user-disconnected');
     });
 });

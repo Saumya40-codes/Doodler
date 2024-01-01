@@ -21,12 +21,6 @@ const Page = () => {
     getUser();
   }, [user]); 
 
-  useEffect(() => {
-    socket.on('user-disconnected', (userId: string) => {
-      console.log('user-disconnected', userId);
-    });
-  }, []);
-
   return (
     <div className={styles.main}>
       <div className={styles.memberlist}>
