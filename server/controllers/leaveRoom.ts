@@ -26,7 +26,6 @@ export const connectToDB = async () => {
 }
 
 export const leaveRoom = async (roomId:string, username:string) => {
-    console.log(roomId,username);
     try{
         await connectToDB();
 

@@ -4,6 +4,8 @@ import React, { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Canvas from '@/app/components/Canvas/Canvas';
 import socket from '@/utils/socket';
+import styles from './room.module.css'
+import Memberlist from '@/app/components/MemberList/Memberlist';
 
 const Page = () => {
   const { id } = useParams();
@@ -19,10 +21,20 @@ const Page = () => {
     getUser();
   }, [user]); 
 
+  useEffect(() => {
+    socket.on('user-disconnected', (userId: string) => {
+      console.log('user-disconnected', userId);
+    });
+  }, []);
+
   return (
-    <div>
-      hello {id}
-      <Canvas roomId={id as string}/>
+    <div className={styles.main}>
+      <div className={styles.memberlist}>
+        <Memberlist roomId={id as string}/>
+      </div>
+      <div className={styles.canvas}>
+        <Canvas roomId={id as string}/>
+      </div>
     </div>
   );
 };

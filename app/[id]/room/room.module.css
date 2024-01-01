@@ -1,0 +1,7 @@
+.main{
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    margin-top: 25px;
+    gap: 155px;
+}

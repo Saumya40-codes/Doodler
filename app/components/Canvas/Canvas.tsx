@@ -1,22 +1,22 @@
 'use client'
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDraw } from "@/hooks/useDraw";
 import { drawLine } from "@/utils/drawLine";
 import socket from "@/utils/socket";
 
-const Canvas = ({roomId}:{roomId:string}) => {
-  const[color,setColor] = useState('#000')
-  const { canvasRef, onMouseDown, clear} = useDraw(createLine);
+const Canvas = ({ roomId }: { roomId: string }) => {
+  const [color, setColor] = useState("#000");
+  const { canvasRef, onMouseDown, clear } = useDraw(createLine);
 
   useEffect(() => {
     const colorPicker = document.getElementById('color-picker') as HTMLInputElement;
     colorPicker.addEventListener('change', (e) => {
-        setColor(colorPicker.value);
+      setColor(colorPicker.value);
     })
 
     return () => {
-      colorPicker.removeEventListener("change", (e)=>{
+      colorPicker.removeEventListener("change", (e) => {
         setColor(colorPicker.value);
       });
     };
@@ -27,7 +27,7 @@ const Canvas = ({roomId}:{roomId:string}) => {
 
     const user = localStorage.getItem('user');
 
-    if(user) socket.emit('join-room', roomId, user);
+    if (user) socket.emit('join-room', roomId, user);
 
     socket.on('user-connected', (username) => {
       console.log(username, 'connected');
@@ -36,22 +36,22 @@ const Canvas = ({roomId}:{roomId:string}) => {
     socket.emit('new-client', roomId);
 
     socket.on('get-canvas-state', () => {
-        if (!canvasRef.current?.toDataURL) return;
-        socket.emit('canvas-state', {canvasState: canvasRef.current?.toDataURL(),roomId});
+      if (!canvasRef.current?.toDataURL) return;
+      socket.emit('canvas-state', { canvasState: canvasRef.current?.toDataURL(), roomId });
     });
 
     socket.on('canvas-state-from-server', (image) => {
-        if (!ctx) return;
-        const canvasImage = new Image();
-        canvasImage.src = image;
-        canvasImage.onload = () => {
-            ctx.drawImage(canvasImage, 0, 0);
-        }
+      if (!ctx) return;
+      const canvasImage = new Image();
+      canvasImage.src = image;
+      canvasImage.onload = () => {
+        ctx.drawImage(canvasImage, 0, 0);
+      }
     });
 
     socket.on('draw-line', ({ prevPoint, currentPoint, color }: DrawLineProps) => {
-        if (!ctx) return;
-        drawLine({ prevPoint, currentPoint, ctx, color });
+      if (!ctx) return;
+      drawLine({ prevPoint, currentPoint, ctx, color });
     });
 
     socket.on('clear', clear);
@@ -61,30 +61,22 @@ const Canvas = ({roomId}:{roomId:string}) => {
     });
 
     return () => {
-        socket.off('user-connected');
-        socket.off('get-canvas-state');
-        socket.off('canvas-state-from-server');
-        socket.off('draw-line');
-        socket.off('clear');
+      socket.off('user-connected');
+      socket.off('get-canvas-state');
+      socket.off('canvas-state-from-server');
+      socket.off('draw-line');
+      socket.off('clear');
     };
 
-}, [canvasRef]);
-  
+  }, [canvasRef]);
 
-  function createLine({prevPoint, currentPoint, ctx} : Draw) {
-    socket.emit('draw-line',{prevPoint, currentPoint, color,roomId});
-    drawLine({prevPoint, currentPoint, ctx, color});
+  function createLine({ prevPoint, currentPoint, ctx }: Draw) {
+    socket.emit('draw-line', { prevPoint, currentPoint, color, roomId });
+    drawLine({ prevPoint, currentPoint, ctx, color });
   }
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center">
-      <div className="block  flex-col items-center">
-      <label htmlFor="color-picker">Select a color:</label>
-      <input id="color-picker" type="color" />
-      </div>
-        <button className="border border-black rounded-md px-2 py-1" onClick={()=> socket.emit('clear',roomId)}>
-          Clear
-        </button>
+    <div className="flex justify-center items-center flex-col">
       <canvas
         onMouseDown={onMouseDown}
         ref={canvasRef}
@@ -92,6 +84,15 @@ const Canvas = ({roomId}:{roomId:string}) => {
         height={750}
         className="border border-black rounded-md"
       />
+      <div className="block flex-col items-center">
+        <label htmlFor="color-picker">Select a color:</label>
+        <input id="color-picker" type="color" />
+      </div>
+      <div>
+        <button className="border border-black rounded-md px-2 py-1" onClick={() => socket.emit('clear', roomId)}>
+          Clear
+        </button>
+      </div>
     </div>
   );
 };

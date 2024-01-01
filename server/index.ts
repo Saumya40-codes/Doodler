@@ -6,6 +6,7 @@ const app = express();
 const server = http.createServer(app);
 
 import { leaveRoom } from './controllers/leaveRoom';
+import {DrawLine} from './types/types';
 
 const io = new Server(server, {
     cors: {
@@ -17,18 +18,6 @@ const io = new Server(server, {
 server.listen(5000,()=>{
     console.log('listening on port 5000');
 });
-
-interface Point{
-    x:number,
-    y:number
-}
-
-interface DrawLine{
-    prevPoint: Point | null,
-    currentPoint: Point,
-    color: string,
-    roomId: string
-}
 
 io.on('connection', (socket) => {
 
@@ -58,12 +47,11 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', ()=>{
         const {roomId,username} = socket.handshake.query as {roomId:string,username:string};
-        console.log(roomId,username);
-            
+                
         if (roomId && username) {
             leaveRoom(roomId, username);
         }
 
-        socket.broadcast.to(roomId).emit('user-disconnected', username);
+        socket.broadcast.to(roomId).emit('user-disconnected');
     });
 });
