@@ -14,6 +14,8 @@ const Room = () => {
   const [clickJoin, setClickJoin] = useState<boolean>(false);
   const [clickCreate, setClickCreate] = useState<boolean>(false);
   const [error, setError] = useState<string>('');  
+  const [access, setAccess] = useState<string>('public');
+  const[clickRandom, setClickRandom] = useState<boolean>(false);
 
   const generateRoomCode = () => {
     const newRoomCode = nanoid(6);
@@ -27,8 +29,11 @@ const Room = () => {
     const data = {
       id: generatedRoomCode,
       owner: user,
+      access,
       members: [user],
     };
+
+    console.log(data);
 
     const res = await fetch('/api/room/newroom', {
       method: 'POST',
@@ -65,7 +70,7 @@ const Room = () => {
     });
 
     const result = await res.json();
-    console.log(result)
+    // console.log(result)
 
     if(result.status === 200){
       localStorage.setItem('user',user);
@@ -74,6 +79,40 @@ const Room = () => {
     }
     else if(result.status === 404){
       setError('Room not found');
+    }
+  }
+
+  const handleRandom = async() => {
+    try{
+      const res = await fetch('/api/room/joinroom');
+      const result = await res.json();
+      const roomId = result.id;
+
+      const data = {
+        id: roomId,
+        user: user,
+      }
+
+      const res2 = await fetch('/api/room/joinroom',{
+        method:'POST',
+        headers:{
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result2 = await res2.json();
+      if(result2.status === 200){
+        localStorage.setItem('user',user);
+        localStorage.setItem('room',roomId);
+        window.location.href = `/${roomId}/room`;
+      }
+      else if(result2.status === 404){
+        setError('Internal server error occured');
+      }
+    }
+    catch(err){
+      setError('Internal server error');
     }
   }
 
@@ -86,11 +125,15 @@ const Room = () => {
             <EnterCode
               text="Enter name"
               onChange={(val) => setUser(val)}
+              clickCreate={clickCreate}
+              onSelectChange={(val) => setAccess(val)}
             />
-            {!clickCreate && (
+            {!clickCreate && !clickRandom && (
               <EnterCode
                 text="Enter code"
                 onChange={(val) => setRoomCode(val)}
+                clickCreate={clickCreate}
+                onSelectChange={(val) => setAccess(val)}
               />
             )}
             <div className='flex justify-center'>
@@ -98,7 +141,11 @@ const Room = () => {
                 colorScheme="teal"
                 variant="outline"
                 size="sm"
-                onClick={() => setClickJoin((prevClickJoin) => !prevClickJoin)}
+                onClick={() => {
+                  setClickJoin((prevClickJoin) => !prevClickJoin)
+                  setClickCreate((prevClickCreate) => !prevClickCreate)
+                  setError('');
+                }}
                 className={styles.otherBtn}
               >
                 Cancel
@@ -110,7 +157,17 @@ const Room = () => {
                 className={styles.otherBtn}
                 onClick={()=>{
                   setError('');
-                  clickCreate ? handleNew() : handleJoin();
+                  switch(true){
+                    case clickCreate:
+                      handleNew();
+                      break;
+                    case clickRandom:
+                      handleRandom();
+                      break;
+                    default:
+                      handleJoin();
+                      break;
+                  }
                 }}
               >
                 Join
@@ -142,6 +199,19 @@ const Room = () => {
           }}
         >
           Create Room
+        </Button>
+      </div>
+      <div className={styles.randomBtn}>
+      <Button
+          colorScheme="teal"
+          variant="outline"
+          size="lg"
+          onClick={() => {
+            setClickJoin((prevClickJoin) => !prevClickJoin);
+            setClickRandom((prevClickRandom) => !prevClickRandom);
+          }}
+        >
+          Join Random Room
         </Button>
       </div>
     </div>

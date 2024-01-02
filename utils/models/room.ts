@@ -9,6 +9,10 @@ const roomSchema = new mongoose.Schema({
     owner: {
         type:String,
     },
+    access :{
+        type: String,
+        required: true,
+    },
     members: [{
         required: false,
         type: String,

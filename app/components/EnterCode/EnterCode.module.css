@@ -2,3 +2,35 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+.inp{
+    margin-left: 8px;
+}
+
+.inps{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap:12px;
+}
+
+.block{
+    display: flex;
+    flex-direction: row;
+    margin: 10px 0 10px 0;
+}
+
+.access{
+    padding: 5px 70px 5px 70px;
+    border-radius: 5px;
+    margin-left: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 0.5px solid rgba(221, 221, 221, 0.867);
+}
+
+.opt{
+    color: black;
+    font-weight: bold;
+    font-size: 15px;
+}
