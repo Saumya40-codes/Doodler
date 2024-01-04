@@ -53,10 +53,6 @@ const Canvas = ({ roomId }: { roomId: string }) => {
 
     socket.on('clear', clear);
 
-    socket.on('user-disconnected', (username) => {
-      console.log(`${username} has left the room`);
-    });
-
     return () => {
       socket.off('get-canvas-state');
       socket.off('canvas-state-from-server');
