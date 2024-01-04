@@ -52,11 +52,6 @@ const Chat = ({ roomId }: { roomId: string }) => {
         return [...prevMessages, `\n \n \t \t \t \t \t${str_to_add}`];
       });
     }));
-
-    return () => {
-      socket.off('message-receive');
-      socket.off('user-disconnected');
-    };
   }, []); 
 
   return (

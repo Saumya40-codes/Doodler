@@ -53,13 +53,6 @@ const Canvas = ({ roomId }: { roomId: string }) => {
 
     socket.on('clear', clear);
 
-    return () => {
-      socket.off('get-canvas-state');
-      socket.off('canvas-state-from-server');
-      socket.off('draw-line');
-      socket.off('clear');
-    };
-
   }, [canvasRef]);
 
   function createLine({ prevPoint, currentPoint, ctx }: Draw) {

@@ -23,11 +23,6 @@ const Memberlist = ({ roomId }: MemberProps) => {
         socket.on('user-connected', async(username:string) => {
             await getMembers();
         });
-
-        return () => {
-            socket.off('user-disconnected');
-            socket.off('user-connected');
-        }
     }, []);
 
     const getMembers = async() =>{
