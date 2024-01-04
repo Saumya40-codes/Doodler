@@ -10,7 +10,7 @@ import { DrawLine } from './types/types';
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://localhost:3000", "https://doodler-ecru.vercel.app"],
+        origin: ["http://localhost:3000", "https://doodler-ecru.vercel.app", "https://doodler-saumya40-codes.vercel.app/", "https://doodler-git-master-saumya40-codes.vercel.app/", "https://doodler-oonjpf5hg-saumya40-codes.vercel.app/"],
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     }
 });
