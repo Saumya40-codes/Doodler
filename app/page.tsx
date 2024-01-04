@@ -39,7 +39,7 @@ const Page = () => {
           bgGradient: "linear(to-r, red.500, purple.700)",
         }}
       >
-        Let's Doodle
+        Let&apos;s Doodle!
       </Button>
       </Link>
     </Box>
