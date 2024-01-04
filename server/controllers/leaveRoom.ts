@@ -1,8 +1,6 @@
 import Room from "../models/room";
 import mongoose from "mongoose";
 let isConnected: boolean = false;
-import env from "dotenv";
-env.config();
 
 export const connectToDB = async () => {
     mongoose.set("strictQuery", true);
