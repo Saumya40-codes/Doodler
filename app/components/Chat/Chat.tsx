@@ -8,7 +8,6 @@ const Chat = ({ roomId }: { roomId: string }) => {
   const [messages, setMessages] = useState<string[]>(['Welcome to Doodler!']);
   const [message, setMessage] = useState('');
   const [username, setUsername] = useState('unknown');
-  const[isConnected,setIsConnected] = useState<boolean>(false);
 
   useEffect(() => {
     const user = localStorage.getItem('user');
@@ -54,20 +53,9 @@ const Chat = ({ roomId }: { roomId: string }) => {
       });
     }));
 
-    socket.on('user-connected', (newUsername:string)=>{
-      if(!isConnected){
-        setIsConnected(true);
-        setMessages((prevMessages) => {
-          const str_to_add = `${newUsername} joined the room`;
-          return [...prevMessages, `\n \n \t \t \t \t \t${str_to_add}`];
-        });
-      }
-    });
-
     return () => {
       socket.off('message-receive');
       socket.off('user-disconnected');
-      setIsConnected(false);
     };
   }, []); 
 
@@ -81,8 +69,12 @@ const Chat = ({ roomId }: { roomId: string }) => {
           readOnly
         />
       </div>
-      <div>
-        <ArrowRightIcon marginRight='10px' /><input
+      <div className={styles.cont}>
+        <div>
+        <ArrowRightIcon marginRight='10px' />
+        </div>
+        <div>
+        <input
           type='text'
           value={message}
           placeholder='Type your message here!'
@@ -90,6 +82,7 @@ const Chat = ({ roomId }: { roomId: string }) => {
           onChange={(e) => handleInputChange(e)}
           onKeyDown={(e) => handleEnter(e)}
         />
+        </div>
       </div>
     </div>
   );

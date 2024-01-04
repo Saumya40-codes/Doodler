@@ -34,6 +34,10 @@ const Page = () => {
         bottom="50%"
         left="50%"
         transform="translateX(-50%)"
+        transition="0.5s ease-in-out"
+        _hover={{
+          bgGradient: "linear(to-r, red.500, purple.700)",
+        }}
       >
         Let's Doodle
       </Button>

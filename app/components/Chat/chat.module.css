@@ -7,9 +7,18 @@
 }
 
 .inp{
-    width:380px;
+    width:350px;
     height: 35px;
     border-radius: 2.5px;
     text-align: center;
     background: rgba(255, 255, 255, 0.05);
+    margin-right: 25px;
+}
+
+.cont{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 12px;
 }

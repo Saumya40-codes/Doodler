@@ -23,6 +23,12 @@ const Room = () => {
     return newRoomCode;
   };
 
+  const endAll = () =>{
+    setClickJoin(false);
+    setClickCreate(false);
+    setClickRandom(false);
+  }
+
   const handleNew = async () => {
     const generatedRoomCode = generateRoomCode();
 
@@ -43,6 +49,7 @@ const Room = () => {
 
     const result = await res.json();
     if(result.message === 'Room created'){
+      endAll();
       localStorage.setItem('user',user);
       localStorage.setItem('room',generatedRoomCode);
       window.location.href = `/${generatedRoomCode}/room`;
@@ -71,6 +78,7 @@ const Room = () => {
     // console.log(result)
 
     if(result.status === 200){
+      endAll();
       localStorage.setItem('user',user);
       localStorage.setItem('room',roomCode);
       window.location.href = `/${roomCode}/room`;
@@ -101,6 +109,7 @@ const Room = () => {
 
       const result2 = await res2.json();
       if(result2.status === 200){
+        endAll();
         localStorage.setItem('user',user);
         localStorage.setItem('room',roomId);
         window.location.href = `/${roomId}/room`;
@@ -140,9 +149,8 @@ const Room = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  setClickJoin((prevClickJoin) => !prevClickJoin)
-                  setClickCreate((prevClickCreate) => !prevClickCreate)
                   setError('');
+                  endAll();
                 }}
                 className={styles.otherBtn}
               >

@@ -4,12 +4,11 @@ import { useEffect, useState } from "react";
 import { useDraw } from "@/hooks/useDraw";
 import { drawLine } from "@/utils/drawLine";
 import socket from "@/utils/socket";
-import { EditIcon } from "@chakra-ui/icons";
+import styles from './canvas.module.css';
 
 const Canvas = ({ roomId }: { roomId: string }) => {
   const [color, setColor] = useState("#000");
   const { canvasRef, onMouseDown, clear } = useDraw(createLine);
-  const [canDraw, setCanDraw] = useState<boolean>(false);
 
   useEffect(() => {
     const colorPicker = document.getElementById('color-picker') as HTMLInputElement;
@@ -81,12 +80,12 @@ const Canvas = ({ roomId }: { roomId: string }) => {
         height={750}
         className="border border-black rounded-md"
       />
-      <div className="block flex-col items-center">
+      <div className={styles.colrs}>
         <label htmlFor="color-picker">Select a color:</label>
-        <input id="color-picker" type="color" />
+        <input id="color-picker" type="color" className={styles.cpicker} />
       </div>
       <div>
-        <button className="border border-black rounded-md px-2 py-1" onClick={() => socket.emit('clear', roomId)}>
+        <button className={styles.clr} onClick={() => socket.emit('clear', roomId)}>
           Clear
         </button>
       </div>
