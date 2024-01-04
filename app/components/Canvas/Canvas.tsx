@@ -31,10 +31,6 @@ const Canvas = ({ roomId }: { roomId: string }) => {
 
     if (user) socket.emit('join-room', roomId, user);
 
-    socket.on('user-connected', (username) => {
-      console.log(username, 'connected');
-    });
-
     socket.emit('new-client', roomId);
 
     socket.on('get-canvas-state', () => {
@@ -63,7 +59,6 @@ const Canvas = ({ roomId }: { roomId: string }) => {
     });
 
     return () => {
-      socket.off('user-connected');
       socket.off('get-canvas-state');
       socket.off('canvas-state-from-server');
       socket.off('draw-line');

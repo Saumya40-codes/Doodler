@@ -27,9 +27,9 @@ io.on('connection', (socket) => {
 
     socket.on('join-room', (roomId: string, username: string) => {
         socket.join(roomId);
-
         socket.handshake.query = { roomId, username };
 
+        // io.to(roomId).emit('user-connected-to-room', username);
         io.to(roomId).emit('user-connected', username);
     });
 
@@ -52,10 +52,14 @@ io.on('connection', (socket) => {
             if (roomId && username) {
                 await leaveRoom(roomId, username);
     
-                socket.broadcast.to(roomId).emit('user-disconnected');
+                socket.broadcast.to(roomId).emit('user-disconnected', username);
             }
         } catch (error) {
             console.error(error);
         }
+    });
+
+    socket.on('message', (message: {message:string,roomId:string,username:string}) => {
+        socket.broadcast.to(message.roomId).emit('message-receive', message);
     });
 });

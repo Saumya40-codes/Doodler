@@ -34,7 +34,6 @@ export async function GET(request: Request) {
     try {
         await connectToDB();
         let count = await Room.find({});
-        console.log(count);
 
         count = count.filter((room) => room.access === "public");
 

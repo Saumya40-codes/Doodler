@@ -33,8 +33,6 @@ const Room = () => {
       members: [user],
     };
 
-    console.log(data);
-
     const res = await fetch('/api/room/newroom', {
       method: 'POST',
       headers: {

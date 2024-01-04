@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Canvas from '@/app/components/Canvas/Canvas';
-import socket from '@/utils/socket';
 import styles from './room.module.css'
 import Memberlist from '@/app/components/MemberList/Memberlist';
 import Chat from '@/app/components/Chat/Chat';

@@ -3,7 +3,11 @@ import { Card,CardBody ,Text } from '@chakra-ui/react'
 import styles from './memberlist.module.css'
 import socket from '@/utils/socket'
 
-const Memberlist = ({ roomId }: { roomId: string }) => {
+interface MemberProps{
+    roomId: string,
+}
+
+const Memberlist = ({ roomId }: MemberProps) => {
 
     const[members,setMembers] = useState<string[]>([]);
 
@@ -12,20 +16,18 @@ const Memberlist = ({ roomId }: { roomId: string }) => {
     }, []);
 
     useEffect(() => {
-        socket.on('user-disconnected', () => {
-            console.log('user-disconnected');
+        socket.on('user-disconnected', (username:string) => {
             getMembers();
         });
 
-        socket.on('user-connected', () => {
-            getMembers();
+        socket.on('user-connected', async(username:string) => {
+            await getMembers();
         });
 
         return () => {
             socket.off('user-disconnected');
             socket.off('user-connected');
         }
-
     }, []);
 
     const getMembers = async() =>{
@@ -43,8 +45,6 @@ const Memberlist = ({ roomId }: { roomId: string }) => {
             });
             const data = await res.json();
             setMembers(data?.mem_list);
-
-            console.log(data);
         }
         catch(err){
             console.log(err);
