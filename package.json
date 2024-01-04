@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/react": "^2.8.2",
     "@types/nodemon": "^1.19.6",
     "bufferutil": "^4.0.8",
     "mongoose": "^8.0.3",
