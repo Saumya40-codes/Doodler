@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Doodler
 
-## Getting Started
+A Next.js and Socket.io-based canvas of creativity, Doodler lets you craft your own rooms, join friends with unique IDs, or mingle in public random rooms. Chat and draw in real-time all together.
 
-First, run the development server:
+----
+### Demo
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+https://github.com/Saumya40-codes/Doodler/assets/115284013/31be787d-778a-4c96-ab6c-1aa45329b107
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+----
+### Features:
 
-## Learn More
+- Room Creation:
+  - Users can create personalized rooms.
+  
+- Friend's Room Joining:
+  - Join friends' rooms using unique room IDs.
+    
+- Public Random Rooms:
+  - Join public random rooms for spontaneous collaboration.
+    
+- Private Rooms:
+  - No random user can join and other than the owner, people with ids can only join
+ 
+ - Real-time Chat:
+   - Seamless chat functionality within each room.
+     
+- Collaborative Drawing:
+  - Users can draw together in real-time.
+    
+- Keep track of which user joined or left
 
-To learn more about Next.js, take a look at the following resources:
+----
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Tech Stack
+- Typescript
+- Nextjs
+- ChakraUI
+- socket.io
+- Express
+- MongoDB
