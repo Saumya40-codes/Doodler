@@ -65,8 +65,8 @@ const Canvas = ({ roomId }: { roomId: string }) => {
       <canvas
         onMouseDown={onMouseDown}
         ref={canvasRef}
-        width={750}
-        height={750}
+        width={800}
+        height={800}
         className="border border-black rounded-md"
       />
       <div className={styles.colrs}>

@@ -4,17 +4,73 @@ import styles from './chat.module.css';
 import { ArrowRightIcon } from '@chakra-ui/icons';
 import socket from '@/utils/socket';
 
-const Chat = ({ roomId }: { roomId: string }) => {
+interface ChatProps{
+  roomId: string,
+  username:string | null
+}
+
+interface messageProps{
+  message: string | null, 
+  roomId: string | null, 
+  username: string | null
+}
+
+const Chat = ({ roomId,username }: ChatProps) => {
   const [messages, setMessages] = useState<string[]>(['Welcome to Doodler!']);
   const [message, setMessage] = useState('');
-  const [username, setUsername] = useState('unknown');
+  const [newUser, setNewUser] = useState<string | null>(null);
+  const [leftUser, setLeftUser] = useState<string | null>(null);
+  const [receivedMessage, setReceivedMessage] = useState<messageProps>({
+    message: null,
+    roomId: null,
+    username: null,
+  });
+
+  const getNewUser = useCallback((newname:string|null) => {
+    if(newname){
+      setMessages((prevMessages) => {
+        let str_to_add = `${newname} joined the room`;
+        return [...prevMessages, `\n \n \t \t \t \t \t${str_to_add}`];
+      });
+    }
+  }, [socket,newUser]);
+
+  const getLeftUser = useCallback((leftname:string|null) => {
+    if(leftname){
+      setMessages((prevMessages) => {
+        let str_to_add = `${leftname} left the room`;
+        return [...prevMessages, `\n \n \t \t \t \t \t${str_to_add}`];
+      });
+    }
+  }, [socket,leftUser]);
+
+  const getMessages = useCallback( (data: messageProps) => {
+    if(data.message && data.username){
+      let str_to_add = `${data.username}: ${data.message}`;
+      setMessages((prevMessages) => [...prevMessages, `\n \n ${str_to_add}`]);
+    }
+  }, [socket,receivedMessage,newUser]);
+
+  useEffect(()=>{
+    socket.on('user-connected',(newUsername:string) => {
+      setNewUser(newUsername);
+    });
+    getNewUser(newUser);
+  },[newUser])
+
+  useEffect(()=>{
+    socket.on('user-disconnected',(leftUsername:string) => {
+      setLeftUser(leftUsername);
+    });
+    getLeftUser(leftUser);
+  },[socket,leftUser])
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      setUsername(user);
-    }
-  }, [username]);
+    socket.on('message-receive',  (data: { message: string, roomId: string, username: string }) => {
+      setReceivedMessage(data);
+    });
+    getMessages(receivedMessage);
+  }, [socket, receivedMessage]); 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
@@ -39,20 +95,6 @@ const Chat = ({ roomId }: { roomId: string }) => {
     setMessages(prevMessages => [...prevMessages, `\n \n ${str_to_add}`]);
     setMessage('');
   }
-
-  useEffect(() => {
-    socket.on('message-receive', (data: { message: string, roomId: string, username: string }) => {
-      let str_to_add = `${data.username}: ${data.message}`;
-      setMessages((prevMessages) => [...prevMessages, `\n \n ${str_to_add}`]);
-    });
-
-    socket.on('user-disconnected', ((username: string) => {
-      setMessages((prevMessages) => {
-        let str_to_add = `${username} left the room`;
-        return [...prevMessages, `\n \n \t \t \t \t \t${str_to_add}`];
-      });
-    }));
-  }, []); 
 
   return (
     <div className={styles.mainchat}>
