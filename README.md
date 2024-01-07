@@ -3,6 +3,8 @@
 A Next.js and Socket.io-based canvas of creativity, Doodler lets you craft your own rooms, join friends with unique IDs, or mingle in public random rooms. Chat and draw in real-time all together.
 
 ----
+##### **Proper functionality in the deployed link might not be there due to the behaviour of the render(on which backend(sockets) is being deployed) which needs to be refreshed periodically if there is inactivity**
+----
 ### Demo
 
 
