@@ -14,8 +14,17 @@ const Page = () => {
   useEffect(() => {
     
     const getUser = async() =>{
-      const storedUser = await localStorage.getItem('user');
-      setUser(storedUser);
+      try{
+        const storedUser = await localStorage.getItem('user');
+
+        if(!storedUser || storedUser === 'null'){
+          window.location.href = '/Room';
+        }
+        setUser(storedUser);
+      }
+      catch(err){
+        window.location.href = '/Room';
+      }
     }
 
     getUser();
