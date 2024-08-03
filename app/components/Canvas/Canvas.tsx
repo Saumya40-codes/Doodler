@@ -19,7 +19,7 @@ const Canvas: React.FC<CanvasProps> = ({ roomId }) => {
   const [color, setColor] = useState("#000000");
   const [brushRadius, setBrushRadius] = useState(5);
   const [eraserMode, setEraserMode] = useState(false);
-  const { canvasRef, onMouseDown, clear } = useDraw(createLine);
+  const { canvasRef, onMouseDown, clear, undo } = useDraw(createLine);
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -37,9 +37,10 @@ const Canvas: React.FC<CanvasProps> = ({ roomId }) => {
       };
     });
 
-    socket.on("get-canvas-state", () => [
-      socket.emit("canvas-state", { canvasState: canvasRef.current?.toDataURL(), roomId }),
-    ])
+    socket.on("get-canvas-state", () => {
+      if (!canvasRef.current) return;
+      socket.emit("canvas-state", { canvasState: canvasRef.current.toDataURL(), roomId });
+    });
 
     socket.on("draw-line", ({ prevPoint, currentPoint, color }) => {
       const ctx = canvasRef.current?.getContext("2d");
@@ -128,6 +129,9 @@ const Canvas: React.FC<CanvasProps> = ({ roomId }) => {
       <HStack spacing={4}>
         <Button onClick={handleClear} variant="destructive">
           Clear Canvas
+        </Button>
+        <Button onClick={undo} variant="secondary">
+          Undo
         </Button>
       </HStack>
     </VStack>
