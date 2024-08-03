@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Canvas from '@/app/components/Canvas/Canvas';
-import { Box, Flex, Heading, VStack, Text, Divider } from '@chakra-ui/react';
+import { Box, Flex, Heading } from '@chakra-ui/react';
 import Memberlist from '@/app/components/MemberList/Memberlist';
 import Chat from '@/app/components/Chat/Chat';
+import { BackgroundBeams } from "@/components/ui/background-beams";
 
 const Page: React.FC = () => {
   const { id } = useParams();
@@ -28,49 +29,39 @@ const Page: React.FC = () => {
   }, []);
 
   return (
-    <Box
-      w="100%"
-      h="100vh"
-      bgGradient="linear(to-r, #f5f5f5, #c1c1c1)" // Gradient background
-      color="white"
-      display="flex"
-      flexDirection="column"
-    >
+    <Box w="100%" h="100vh" bg='gray.800' color="white" position="relative">
+      <BackgroundBeams />
       <Flex
-        direction="row"
-        justify="space-between"
-        align="flex-start"
-        p={8}
-        gap={4}
-        w="100%"
+        direction="column"
         h="100%"
-        overflow="hidden"
+        position="relative"
+        zIndex={1}
       >
-        <Box flex="1" p={4} bg="rgba(0, 0, 0, 0.6)" borderRadius="lg" boxShadow="lg">
-          <Memberlist roomId={id as string} />
-        </Box>
-        <Box flex="2" p={4} bg="rgba(0, 0, 0, 0.6)" borderRadius="lg" boxShadow="lg" position="relative">
-          <Canvas roomId={id as string} />
-        </Box>
-        <Box flex="1" p={4} bg="rgba(0, 0, 0, 0.6)" borderRadius="lg" boxShadow="lg">
-          <Chat roomId={id as string} username={user} />
-        </Box>
+        <Heading as="h1" size="xl" textAlign="center" py={4} color="white">
+          Doodle Room: {id}
+        </Heading>
+        <Flex flex={1} p={4} gap={4} overflow="hidden">
+          <CustomBox>
+            <Memberlist roomId={id as string} />
+          </CustomBox>
+          <Box flex="3" bg='gray.800' borderRadius="lg" boxShadow="lg" overflow="hidden">
+            <Canvas roomId={id as string} />
+          </Box>
+          <CustomBox>
+            <Chat roomId={id as string} username={user} />
+          </CustomBox>
+        </Flex>
       </Flex>
-      <Box
-        position="absolute"
-        bottom="0"
-        left="0"
-        right="0"
-        p={4}
-        bg="rgba(0, 0, 0, 0.6)"
-        borderTop="1px solid rgba(255, 255, 255, 0.3)"
-      >
-        <Text textAlign="center" fontSize="sm" color="gray.300">
-          Doodle Room © 2024
-        </Text>
-      </Box>
     </Box>
   );
 };
+
+const CustomBox: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+  return (
+    <Box flex="1" bg='gray.800' borderRadius="lg" boxShadow="lg" overflow="hidden">
+      {children}
+    </Box>
+  );
+}
 
 export default Page;

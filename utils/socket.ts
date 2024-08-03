@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-// const socket = io("https://doodler-api.onrender.com/");
-const socket = io("http://localhost:5000");
+const ENDPOINT = process.env.ENDPOINT || 'http://localhost:5000';
+const socket = io(ENDPOINT);
 
 export default socket;

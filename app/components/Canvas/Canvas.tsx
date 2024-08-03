@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { ReactSketchCanvas, ReactSketchCanvasRef } from "react-sketch-canvas";
+import { Box, VStack, HStack, Text, Tooltip } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@chakra-ui/react"
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import socket from "@/utils/socket";
@@ -72,55 +73,73 @@ const Canvas: React.FC<CanvasProps> = ({ roomId }) => {
   };
 
   return (
-    <div className="flex flex-col items-center space-y-6 p-8 bg-gray-100 rounded-lg shadow-xl">
-      <div className="relative">
+    <VStack spacing={6} w="100%" h="100%" bg="gray.800" borderRadius="lg" p={4}>
+      <Box position="relative" w="100%" h="80%" borderRadius="lg" overflow="hidden">
         <ReactSketchCanvas
           ref={canvasRef}
-          width="800px"
-          height="600px"
+          width="100%"
+          height="100%"
           strokeColor={eraserMode ? "#ffffff" : color}
           strokeWidth={eraserMode ? 20 : brushRadius}
           onChange={handleSketchChange}
-          className="border border-gray-300 rounded-lg"
+          className="border border-gray-600 rounded-lg"
         />
         {eraserMode && (
-          <div className="absolute top-0 right-0 p-2 text-red-500 bg-white border rounded-lg shadow-md">
+          <Box
+            position="absolute"
+            top={2}
+            right={2}
+            p={2}
+            bg="red.500"
+            color="white"
+            borderRadius="md"
+            fontSize="sm"
+          >
             Eraser Mode
-          </div>
+          </Box>
         )}
-      </div>
-      <div className="flex space-x-4 items-center">
-        <Input
-          type="color"
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
-          className="w-12 h-12 p-1 rounded-full"
-        />
-        <Slider
-          min={1}
-          max={20}
-          step={1}
-          value={[brushRadius]}
-          onValueChange={(value) => setBrushRadius(value[0])}
-          className="w-48"
-        />
-        <span className="text-sm text-gray-600">Brush size: {brushRadius}</span>
-        <Switch
-          checked={eraserMode}
-          onCheckedChange={() => setEraserMode(!eraserMode)}
-          className="ml-4"
-        />
-        <span className="text-sm text-gray-600">Eraser Mode</span>
-      </div>
-      <div className="flex space-x-4">
+      </Box>
+      <HStack spacing={4} w="100%" justifyContent="center">
+        <Tooltip label="Choose color">
+          <Input
+            type="color"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            w={12}
+            h={12}
+            p={1}
+            borderRadius="full"
+            border="none"
+          />
+        </Tooltip>
+        <Box w="200px">
+          <Slider
+            min={1}
+            max={20}
+            step={1}
+            value={[brushRadius]}
+            onValueChange={(value) => setBrushRadius(value[0])}
+          />
+        </Box>
+        <Text fontSize="sm" color="gray.300">
+          Brush size: {brushRadius}
+        </Text>
+        <Tooltip label="Toggle eraser mode">
+          <Switch
+            checked={eraserMode}
+            onCheckedChange={() => setEraserMode(!eraserMode)}
+          />
+        </Tooltip>
+      </HStack>
+      <HStack spacing={4}>
         <Button onClick={handleClear} variant="destructive">
           Clear Canvas
         </Button>
         <Button onClick={handleUndo} variant="secondary">
           Undo
         </Button>
-      </div>
-    </div>
+      </HStack>
+    </VStack>
   );
 };
 

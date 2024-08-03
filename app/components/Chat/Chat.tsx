@@ -1,127 +1,90 @@
-import React, { useEffect, useState, useCallback, useLayoutEffect } from 'react';
-import { Textarea } from '@chakra-ui/react';
-import styles from './chat.module.css';
+'use client'
+
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { VStack, Box, Text, Input, Button, Flex, useColorModeValue } from '@chakra-ui/react';
 import { ArrowRightIcon } from '@chakra-ui/icons';
 import socket from '@/utils/socket';
 
-interface ChatProps{
-  roomId: string,
-  username:string | null
+interface ChatProps {
+  roomId: string;
+  username: string | null;
 }
 
-interface messageProps{
-  message: string | null, 
-  roomId: string | null, 
-  username: string | null
+interface MessageProps {
+  message: string | null;
+  roomId: string | null;
+  username: string | null;
 }
 
-const Chat = ({ roomId,username }: ChatProps) => {
-  const [messages, setMessages] = useState<string[]>(['Welcome to Doodler!']);
+const Chat = ({ roomId, username }: ChatProps) => {
+  const [messages, setMessages] = useState(['Welcome to Doodler!']);
   const [message, setMessage] = useState('');
-  const [newUser, setNewUser] = useState<string | null>(null);
-  const [leftUser, setLeftUser] = useState<string | null>(null);
-  const [receivedMessage, setReceivedMessage] = useState<messageProps>({
-    message: null,
-    roomId: null,
-    username: null,
-  });
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const getNewUser = useCallback((newname:string|null) => {
-    if(newname){
-      setMessages((prevMessages) => {
-        let str_to_add = `${newname} joined the room`;
-        return [...prevMessages, `\n \n \t \t \t \t \t${str_to_add}`];
-      });
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(scrollToBottom, [messages]);
+
+  const handleMessage = useCallback((data: MessageProps) => {
+    if (data.message && data.username) {
+      setMessages((prev) => [...prev, `${data.username}: ${data.message}`]);
     }
-  }, [socket,newUser]);
-
-  const getLeftUser = useCallback((leftname:string|null) => {
-    if(leftname){
-      setMessages((prevMessages) => {
-        let str_to_add = `${leftname} left the room`;
-        return [...prevMessages, `\n \n \t \t \t \t \t${str_to_add}`];
-      });
-    }
-  }, [socket,leftUser]);
-
-  const getMessages = useCallback( (data: messageProps) => {
-    if(data.message && data.username){
-      let str_to_add = `${data.username}: ${data.message}`;
-      setMessages((prevMessages) => [...prevMessages, `\n \n ${str_to_add}`]);
-    }
-  }, [socket,receivedMessage,newUser]);
-
-  useEffect(()=>{
-    socket.on('user-connected',(newUsername:string) => {
-      setNewUser(newUsername);
-    });
-    getNewUser(newUser);
-  },[newUser])
-
-  useEffect(()=>{
-    socket.on('user-disconnected',(leftUsername:string) => {
-      setLeftUser(leftUsername);
-    });
-    getLeftUser(leftUser);
-  },[socket,leftUser])
+  }, []);
 
   useEffect(() => {
-    socket.on('message-receive',  (data: { message: string, roomId: string, username: string }) => {
-      setReceivedMessage(data);
+    socket.on('user-connected', (newUsername: string) => {
+      setMessages((prev) => [...prev, `${newUsername} joined the room`]);
     });
-    getMessages(receivedMessage);
-  }, [socket, receivedMessage]); 
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(e.target.value);
-  }
+    socket.on('user-disconnected', (leftUsername: string) => {
+      setMessages((prev) => [...prev, `${leftUsername} left the room`]);
+    });
 
-  const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
+    socket.on('message-receive', handleMessage);
 
-      socket.emit('message', {
-        message,
-        roomId,
-        username,
-      });
+    return () => {
+      socket.off('user-connected');
+      socket.off('user-disconnected');
+      socket.off('message-receive');
+    };
+  }, [handleMessage]);
 
-      handleTextAreaChange();
+  const sendMessage = () => {
+    if (message.trim()) {
+      socket.emit('message', { message, roomId, username });
+      setMessages((prev) => [...prev, `${username}: ${message}`]);
+      setMessage('');
     }
-  }
-
-  const handleTextAreaChange = () => {
-    let str_to_add = `${username}: ${message}`;
-    setMessages(prevMessages => [...prevMessages, `\n \n ${str_to_add}`]);
-    setMessage('');
-  }
+  };
 
   return (
-    <div className={styles.mainchat}>
-      <div>
-        <Textarea
-          width='380px'
-          height='650px'
-          value={messages.join('')}
-          readOnly
-        />
-      </div>
-      <div className={styles.cont}>
-        <div>
-        <ArrowRightIcon marginRight='10px' />
-        </div>
-        <div>
-        <input
-          type='text'
+    <Box h="100%" bg='gray.900' display="flex" flexDirection="column">
+      <VStack flex={1} spacing={3} align="stretch" p={4} overflowY="auto">
+        {messages.map((msg, index) => (
+          <Text key={index} color='blue.500' fontWeight='bold'>
+            {msg}
+          </Text>
+        ))}
+        <div ref={messagesEndRef} />
+      </VStack>
+      <Flex p={4} borderTop="1px solid" borderColor={useColorModeValue('gray.200', 'gray.600')}>
+        <Input
           value={message}
-          placeholder='Type your message here!'
-          className={styles.inp}
-          onChange={(e) => handleInputChange(e)}
-          onKeyDown={(e) => handleEnter(e)}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Type your message..."
+          bg='gray.300'
+          textColor='darkcyan'
+          fontWeight='bold'
+          mr={2}
+          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
         />
-        </div>
-      </div>
-    </div>
+        <Button onClick={sendMessage} colorScheme="blue" leftIcon={<ArrowRightIcon />}>
+          Send
+        </Button>
+      </Flex>
+    </Box>
   );
 };
 
