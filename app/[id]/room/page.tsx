@@ -6,7 +6,6 @@ import Canvas from '@/app/components/Canvas/Canvas';
 import { Box, Flex, Heading } from '@chakra-ui/react';
 import Memberlist from '@/app/components/MemberList/Memberlist';
 import Chat from '@/app/components/Chat/Chat';
-import { BackgroundBeams } from "@/components/ui/background-beams";
 
 const Page: React.FC = () => {
   const { id } = useParams();
@@ -29,8 +28,7 @@ const Page: React.FC = () => {
   }, []);
 
   return (
-    <Box w="100%" h="100vh" bg='gray.800' color="white" position="relative">
-      <BackgroundBeams />
+    <Box w="100%" h="100vh" bg='gray.800' color="white" position="relative" className='dark:bg-grid-small-white/[0.2] bg-grid-small-black/[0.2]'>
       <Flex
         direction="column"
         h="100%"
