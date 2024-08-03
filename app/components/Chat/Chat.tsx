@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { VStack, Box, Text, Input, Button, Flex, useColorModeValue } from '@chakra-ui/react';
 import { ArrowRightIcon } from '@chakra-ui/icons';
@@ -10,54 +8,93 @@ interface ChatProps {
   username: string | null;
 }
 
-interface MessageProps {
+interface messageProps {
   message: string | null;
   roomId: string | null;
   username: string | null;
 }
 
 const Chat = ({ roomId, username }: ChatProps) => {
-  const [messages, setMessages] = useState(['Welcome to Doodler!']);
+  const [messages, setMessages] = useState<string[]>(['Welcome to Doodler!']);
   const [message, setMessage] = useState('');
+  const [newUser, setNewUser] = useState<string | null>(null);
+  const [leftUser, setLeftUser] = useState<string | null>(null);
+  const [receivedMessage, setReceivedMessage] = useState<messageProps>({
+    message: null,
+    roomId: null,
+    username: null,
+  });
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToBottom = () => {
-    if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(scrollToBottom, [messages]);
 
-  const handleMessage = useCallback((data: MessageProps) => {
-    if (data.message && data.username) {
-      setMessages((prev) => [...prev, `${data.username}: ${data.message}`]);
+  const getNewUser = useCallback((newname:string|null) => {
+    if(newname){
+      setMessages((prevMessages) => {
+        let str_to_add = `${newname} joined the room`;
+        return [...prevMessages, `\n \n \t \t \t \t \t${str_to_add}`];
+      });
     }
-  }, []);
+  }, [socket,newUser]);
+
+  const getLeftUser = useCallback((leftname:string|null) => {
+    if(leftname){
+      setMessages((prevMessages) => {
+        let str_to_add = `${leftname} left the room`;
+        return [...prevMessages, `\n \n \t \t \t \t \t${str_to_add}`];
+      });
+    }
+  }, [socket,leftUser]);
+
+  const getMessages = useCallback( (data: messageProps) => {
+    if(data.message && data.username){
+      let str_to_add = `${data.username}: ${data.message}`;
+      setMessages((prevMessages) => [...prevMessages, `\n \n ${str_to_add}`]);
+    }
+  }, [socket,receivedMessage,newUser]);
+
+  useEffect(()=>{
+    socket.on('user-connected',(newUsername:string) => {
+      setNewUser(newUsername);
+    });
+    getNewUser(newUser);
+  },[newUser])
+
+  useEffect(()=>{
+    socket.on('user-disconnected',(leftUsername:string) => {
+      setLeftUser(leftUsername);
+    });
+    getLeftUser(leftUser);
+  },[socket,leftUser])
 
   useEffect(() => {
-    socket.on('user-connected', (newUsername: string) => {
-      setMessages((prev) => [...prev, `${newUsername} joined the room`]);
+    socket.on('message-receive',  (data: { message: string, roomId: string, username: string }) => {
+      setReceivedMessage(data);
+    });
+    getMessages(receivedMessage);
+  }, [socket, receivedMessage]); 
+
+  const handleEnter = (e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+
+    socket.emit('message', {
+      message,
+      roomId,
+      username,
     });
 
-    socket.on('user-disconnected', (leftUsername: string) => {
-      setMessages((prev) => [...prev, `${leftUsername} left the room`]);
-    });
+    handleTextAreaChange();
+  }
 
-    socket.on('message-receive', handleMessage);
-
-    return () => {
-      socket.off('user-connected');
-      socket.off('user-disconnected');
-      socket.off('message-receive');
-    };
-  }, [handleMessage]);
-
-  const sendMessage = () => {
-    if (message.trim()) {
-      socket.emit('message', { message, roomId, username });
-      setMessages((prev) => [...prev, `${username}: ${message}`]);
-      setMessage('');
-    }
-  };
+  const handleTextAreaChange = () => {
+    let str_to_add = `${username}: ${message}`;
+    setMessages(prevMessages => [...prevMessages, `\n \n ${str_to_add}`]);
+    setMessage('');
+  }
 
   return (
     <Box h="100%" bg='gray.900' display="flex" flexDirection="column">
@@ -78,9 +115,9 @@ const Chat = ({ roomId, username }: ChatProps) => {
           textColor='darkcyan'
           fontWeight='bold'
           mr={2}
-          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+          onKeyDown={(e) => e.key === 'Enter' && handleEnter(e)}
         />
-        <Button onClick={sendMessage} colorScheme="blue" leftIcon={<ArrowRightIcon />}>
+        <Button onClick={(e) => handleEnter(e)} colorScheme="blue" leftIcon={<ArrowRightIcon />}>
           Send
         </Button>
       </Flex>
