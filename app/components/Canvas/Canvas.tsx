@@ -1,89 +1,82 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import { ReactSketchCanvas, ReactSketchCanvasRef } from "react-sketch-canvas";
+import React, { useEffect, useState } from "react";
+import { useDraw } from "@/hooks/useDraw";
+import { drawLine } from "@/utils/drawLine";
+import socket from "@/utils/socket";
 import { Box, VStack, HStack, Text, Tooltip } from "@chakra-ui/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@chakra-ui/react"
+import { Input } from "@chakra-ui/react";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import socket from "@/utils/socket";
-import { CanvasPath } from "@/types/typing";
+import { Draw } from "@/types/typing";
 
 interface CanvasProps {
   roomId: string;
 }
 
 const Canvas: React.FC<CanvasProps> = ({ roomId }) => {
-  const [color, setColor] = useState<string>("#000000");
-  const [brushRadius, setBrushRadius] = useState<number>(5);
-  const [eraserMode, setEraserMode] = useState<boolean>(false);
-  const canvasRef = useRef<ReactSketchCanvasRef>(null);
+  const [color, setColor] = useState("#000000");
+  const [brushRadius, setBrushRadius] = useState(5);
+  const [eraserMode, setEraserMode] = useState(false);
+  const { canvasRef, onMouseDown, clear } = useDraw(createLine);
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) socket.emit('join-room', roomId, user);
+    const user = localStorage.getItem("user");
+    if (user) socket.emit("join-room", roomId, user);
 
-    socket.emit('new-client', roomId);
+    socket.emit("new-client", roomId);
 
-    socket.on('canvas-state-from-server', (canvasState: string) => {
-      if (canvasRef.current) {
-        canvasRef.current.loadPaths(JSON.parse(canvasState));
-      }
+    socket.on("canvas-state-from-server", (image) => {
+      const ctx = canvasRef.current?.getContext("2d");
+      if (!ctx) return;
+      const canvasImage = new Image();
+      canvasImage.src = image;
+      canvasImage.onload = () => {
+        ctx.drawImage(canvasImage, 0, 0);
+      };
     });
 
-    socket.on('draw-line', (line: any) => {
-      if (canvasRef.current) {
-        canvasRef.current.loadPaths(line);
-      }
+    socket.on("get-canvas-state", () => [
+      socket.emit("canvas-state", { canvasState: canvasRef.current?.toDataURL(), roomId }),
+    ])
+
+    socket.on("draw-line", ({ prevPoint, currentPoint, color }) => {
+      const ctx = canvasRef.current?.getContext("2d");
+      if (!ctx) return;
+      drawLine({ prevPoint, currentPoint, ctx, color });
     });
 
-    socket.on('clear', () => {
-      if (canvasRef.current) {
-        canvasRef.current.clearCanvas();
-      }
-    });
+    socket.on("clear", clear);
 
     return () => {
-      socket.off('canvas-state-from-server');
-      socket.off('draw-line');
-      socket.off('clear');
+      socket.off("canvas-state-from-server");
+      socket.off("draw-line");
+      socket.off("clear");
     };
-  }, [roomId]);
+  }, [canvasRef]);
 
-  const handleSketchChange = async () => {
-    if (canvasRef.current) {
-      const paths = await canvasRef.current.exportPaths();
-      socket.emit('draw-line', { paths, roomId });
-    }
-  };
+  function createLine({ prevPoint, currentPoint, ctx }: Draw) {
+    const strokeColor = eraserMode ? "#ffffff" : color;
+    ctx.lineWidth = eraserMode ? 20 : brushRadius;
+    socket.emit("draw-line", { prevPoint, currentPoint, color: strokeColor, roomId });
+    drawLine({ prevPoint, currentPoint, ctx, color: strokeColor });
+  }
 
-  const handleUndo = async () => {
-    if (canvasRef.current) {
-      await canvasRef.current.undo();
-      const paths = await canvasRef.current.exportPaths();
-      socket.emit('canvas-state', { canvasState: JSON.stringify(paths), roomId });
-    }
-  };
-
-  const handleClear = async () => {
-    if (canvasRef.current) {
-      await canvasRef.current.clearCanvas();
-      socket.emit('clear', roomId);
-    }
+  const handleClear = () => {
+    clear();
+    socket.emit("clear", roomId);
   };
 
   return (
     <VStack spacing={6} w="100%" h="100%" bg="gray.800" borderRadius="lg" p={4}>
-      <Box position="relative" w="100%" h="80%" borderRadius="lg" overflow="hidden">
-        <ReactSketchCanvas
+      <Box position="relative" borderRadius="lg" overflow="hidden">
+        <canvas
           ref={canvasRef}
-          width="100%"
-          height="100%"
-          strokeColor={eraserMode ? "#ffffff" : color}
-          strokeWidth={eraserMode ? 20 : brushRadius}
-          onChange={handleSketchChange}
-          className="border border-gray-600 rounded-lg"
+          width={1000}
+          height={800}
+          onMouseDown={onMouseDown}
+          className="border border-gray-600 rounded-lg bg-slate-300"
         />
         {eraserMode && (
           <Box
@@ -135,9 +128,6 @@ const Canvas: React.FC<CanvasProps> = ({ roomId }) => {
       <HStack spacing={4}>
         <Button onClick={handleClear} variant="destructive">
           Clear Canvas
-        </Button>
-        <Button onClick={handleUndo} variant="secondary">
-          Undo
         </Button>
       </HStack>
     </VStack>
