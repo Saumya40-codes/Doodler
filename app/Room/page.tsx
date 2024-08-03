@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import EnterCode from '../components/EnterCode/EnterCode';
 import { nanoid } from 'nanoid';
 import Toast from '../components/Toast/toast';
-import { BackgroundBeams } from "@/components/ui/background-beams";
+import { Boxes } from "@/components/ui/background-boxes";
 
 const Room = () => {
   const [roomCode, setRoomCode] = useState('');
@@ -110,9 +110,9 @@ const Room = () => {
       alignItems="center"
       color="white"
       overflow="hidden"
-      bg="gray.800" // Slightly lighter dark background
+      bg="gray.800" 
     >
-      <BackgroundBeams />
+      <Boxes />
       {error && <Toast status="error" text={error} />}
       
       <VStack spacing={10} zIndex={1} alignItems="center">
