@@ -15,7 +15,7 @@ const EnterCode = ({ text, onChange, clickCreate, onSelectChange }: EnterCodePro
       <Stack spacing={4}>
         <InputGroup className={styles.inps}>
           <div className={styles.block}>
-            <InputLeftAddon>{text.includes('name') ? 'name' : 'code'}</InputLeftAddon>
+            <InputLeftAddon backgroundColor="#87CEEB" fontWeight="bold" color="#000000" marginRight="10px">{text.includes('name') ? 'name' : 'code'}</InputLeftAddon>
             <Input
               type="tel"
               placeholder={text}
@@ -25,7 +25,7 @@ const EnterCode = ({ text, onChange, clickCreate, onSelectChange }: EnterCodePro
           </div>
           {clickCreate && (
             <div className={styles.block}>
-              <InputLeftAddon>access</InputLeftAddon>
+              <InputLeftAddon backgroundColor="#87CEEB" fontWeight="bold" color="#000000" marginRight="10px">access</InputLeftAddon>
               <select
                 title="sel"
                 className={styles.access}
