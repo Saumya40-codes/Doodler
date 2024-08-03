@@ -8,6 +8,19 @@ const server = http.createServer(app);
 import { leaveRoom } from './controllers/leaveRoom';
 import { DrawLine } from './types/types';
 
+interface Point {
+    x: number;
+    y: number;
+}
+
+interface CanvasPath {
+    paths: Point[];
+    strokeWidth: number;
+    strokeColor: string;
+    drawMode: boolean;
+    startTimestamp?: number;
+    endTimestamp?: number;
+}
 const io = new Server(server, {
     cors: {
         origin: ["http://localhost:3000", "https://doodler-ecru.vercel.app", "https://doodler-saumya40-codes.vercel.app/", "https://doodler-git-master-saumya40-codes.vercel.app/", "https://doodler-oonjpf5hg-saumya40-codes.vercel.app/"],
@@ -33,8 +46,8 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('user-connected', username);
     });
 
-    socket.on('draw-line', ({ prevPoint, currentPoint, color, roomId }: DrawLine) => {
-        socket.broadcast.to(roomId).emit('draw-line', { prevPoint, currentPoint, color });
+    socket.on('draw-line', (data: { paths: CanvasPath[], roomId: string }) => {
+        socket.broadcast.to(data.roomId).emit('draw-line', data.paths);
     });
 
     socket.on('canvas-state', ({canvasState,roomId}) => {

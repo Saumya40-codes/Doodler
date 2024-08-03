@@ -1,3 +1,5 @@
+import { Draw } from "@/types/typing";
+
 type DrawLineProps = Draw & {
     color: string;
 }

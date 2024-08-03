@@ -8,6 +8,7 @@ import { Input } from "@chakra-ui/react"
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import socket from "@/utils/socket";
+import { CanvasPath } from "@/types/typing";
 
 interface CanvasProps {
   roomId: string;
@@ -53,7 +54,7 @@ const Canvas: React.FC<CanvasProps> = ({ roomId }) => {
   const handleSketchChange = async () => {
     if (canvasRef.current) {
       const paths = await canvasRef.current.exportPaths();
-      socket.emit('draw-line', paths);
+      socket.emit('draw-line', { paths, roomId });
     }
   };
 
