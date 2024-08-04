@@ -15,6 +15,10 @@ const io = new Server(server, {
     }
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).send('ok');
+});
+
 server.listen(5000, () => {
     console.log('listening on port 5000');
 });
@@ -29,7 +33,6 @@ io.on('connection', (socket) => {
         socket.join(roomId);
         socket.handshake.query = { roomId, username };
 
-        // io.to(roomId).emit('user-connected-to-room', username);
         io.to(roomId).emit('user-connected', username);
     });
 
