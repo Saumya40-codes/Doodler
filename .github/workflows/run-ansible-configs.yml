@@ -47,7 +47,7 @@ jobs:
 
       - name: Run Ansible Playbook
         run: |
-          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory ansible/playbook.yml --vault-password-file .vault_pass -vvv
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory ansible/playbook.yml --vault-password-file .vault_pass
 
       - name: Cleanup
         if: always()
