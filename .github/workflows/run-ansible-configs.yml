@@ -1,4 +1,5 @@
 name: Run Ansible Configurations
+
 on:
   push:
     branches:
@@ -10,9 +11,20 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        shell: bash
+        run: |
+          eval `ssh-agent -s`
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 700 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.EC2_PRIVATE_IP_1 }} >> ~/.ssh/known_hosts
+          ssh-add ~/.ssh/id_ed25519
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -34,19 +46,13 @@ jobs:
           echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > .vault_pass
           ansible-vault decrypt ansible/secrets.yml --vault-password-file .vault_pass
 
-      - name: Add SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
       - name: Test SSH connection
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PRIVATE_IP_1 }} echo "SSH connection successful"
 
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i inventory ansible/playbook.yml --vault-password-file .vault_pass -e "ansible_ssh_private_key_file=~/.ssh/id_ed25519" -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no'"
+          ansible-playbook -i inventory ansible/playbook.yml --vault-password-file .vault_pass -e "ansible_ssh_private_key_file=~/.ssh/id_ed25519" -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no'" -vvv
 
       - name: Cleanup
         if: always()
