@@ -1,16 +1,14 @@
 name: Run Ansible Configurations
-
 on:
   push:
     branches:
       - master
     paths:
       - 'server/**'
-
+      - '.github/workflows/run-ansible-configs.yml'
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -37,14 +35,26 @@ jobs:
 
       - name: Add SSH key
         run: |
+          set -x
           mkdir -p ~/.ssh
-          cat <<EOT > ~/.ssh/id_ed25519
-          ${{ secrets.EC2_SSH_KEY }}
-          EOT
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_ed25519_temp
+          ssh-keygen -p -f ~/.ssh/id_ed25519_temp -m pem -N ""
+          mv ~/.ssh/id_ed25519_temp ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+          ls -l ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.EC2_PRIVATE_IP_1 }} >> ~/.ssh/known_hosts
+          cat ~/.ssh/known_hosts
+        shell: bash
+
+      - name: Test SSH connection
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PRIVATE_IP_1 }} echo "SSH connection successful"
 
       - name: Run Ansible Playbook
         run: |
           ansible-playbook -i inventory ansible/playbook.yml --vault-password-file .vault_pass
 
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f ~/.ssh/id_ed25519 .vault_pass
