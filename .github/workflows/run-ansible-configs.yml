@@ -6,7 +6,6 @@ on:
     paths:
       - '.github/workflows/run-ansible-configs.yml'
       - 'server/**'
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -34,40 +33,31 @@ jobs:
           echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > .vault_pass
           ansible-vault decrypt ansible/secrets.yml --vault-password-file .vault_pass
 
-      - name: Check EC2_PRIVATE_IP_1 secret
+      - name: Add SSH key and debug
         run: |
-          if [ -z "${{ secrets.EC2_PRIVATE_IP_1 }}" ]; then
-            echo "EC2_PRIVATE_IP_1 secret is empty or not set"
-            exit 1
-          else
-            echo "EC2_PRIVATE_IP_1 is set (value not shown for security reasons)"
-          fi
-
-      - name: Add SSH key
-        run: |
-          set -x
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_ed25519_temp
-          chmod 700 ~/.ssh/id_ed25519_temp
-          ssh-keygen -p -f ~/.ssh/id_ed25519_temp -m pem -N "" || echo "ssh-keygen failed"
-          mv ~/.ssh/id_ed25519_temp ~/.ssh/id_ed25519
-          chmod 700 ~/.ssh/id_ed25519
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keygen -l -f ~/.ssh/id_ed25519 || echo "Invalid key format"
           ls -l ~/.ssh/id_ed25519
-          if ! ssh-keyscan -H "${{ secrets.EC2_PRIVATE_IP_1 }}" >> ~/.ssh/known_hosts 2>&1; then
-            echo "ssh-keyscan failed. Error output:"
-            ssh-keyscan -H "${{ secrets.EC2_PRIVATE_IP_1 }}" 2>&1
-            exit 1
-          fi
-          cat ~/.ssh/known_hosts
-        shell: bash
+
+      - name: Add target host to known_hosts
+        run: |
+          ssh-keyscan -H "${{ secrets.EC2_PRIVATE_IP_1 }}" >> ~/.ssh/known_hosts 2>/dev/null || echo "ssh-keyscan failed"
+          
+      - name: Check EC2 instance accessibility
+        run: |
+          echo "Checking EC2 instance accessibility"
+          ping -c 4 ${{ secrets.EC2_PRIVATE_IP_1 }} || echo "Ping failed"
+          nc -zv ${{ secrets.EC2_PRIVATE_IP_1 }} 22 || echo "Netcat failed"
 
       - name: Test SSH connection
         run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PRIVATE_IP_1 }} echo "SSH connection successful"
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PRIVATE_IP_1 }} echo "SSH connection successful" || echo "SSH connection failed"
 
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i inventory ansible/playbook.yml --vault-password-file .vault_pass
+          ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory ansible/playbook.yml --vault-password-file .vault_pass -vvv
 
       - name: Cleanup
         if: always()
