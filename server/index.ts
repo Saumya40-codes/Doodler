@@ -15,6 +15,10 @@ const io = new Server(server, {
     }
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).send('ok');
+});
+
 server.listen(5000, () => {
     console.log('listening on port 5000');
 });
