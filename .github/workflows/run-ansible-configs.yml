@@ -44,16 +44,6 @@ jobs:
       - name: Add target host to known_hosts
         run: |
           ssh-keyscan -H "${{ secrets.EC2_PRIVATE_IP_1 }}" >> ~/.ssh/known_hosts 2>/dev/null || echo "ssh-keyscan failed"
-          
-      - name: Check EC2 instance accessibility
-        run: |
-          echo "Checking EC2 instance accessibility"
-          ping -c 4 ${{ secrets.EC2_PRIVATE_IP_1 }} || echo "Ping failed"
-          nc -zv ${{ secrets.EC2_PRIVATE_IP_1 }} 22 || echo "Netcat failed"
-
-      - name: Test SSH connection
-        run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PRIVATE_IP_1 }} echo "SSH connection successful" || echo "SSH connection failed"
 
       - name: Run Ansible Playbook
         run: |
