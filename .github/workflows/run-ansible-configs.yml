@@ -33,7 +33,7 @@ jobs:
       - name: Decrypt secrets file
         run: |
           echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > .vault_pass
-          ansible-vault decrypt secrets.yml --vault-password-file .vault_pass
+          ansible-vault decrypt ansible/secrets.yml --vault-password-file .vault_pass
 
       - name: Add SSH key
         run: |
@@ -44,5 +44,5 @@ jobs:
 
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i inventory playbook.yml --vault-password-file .vault_pass
+          ansible-playbook -i inventory ansible/playbook.yml --vault-password-file .vault_pass
 
