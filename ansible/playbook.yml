@@ -8,6 +8,7 @@
     app_directory: /home/ubuntu/doodler
     server_directory: "{{ app_directory }}/server"
     nodejs_port: 5000
+    ansible_ssh_common_args: '-o ControlMaster=auto -o ControlPersist=60s'
 
   tasks:
     - name: Update apt cache
