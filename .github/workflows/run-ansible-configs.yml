@@ -1,5 +1,4 @@
 name: Run Ansible Configurations
-
 on:
   push:
     branches:
@@ -11,20 +10,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up SSH
-        shell: bash
-        run: |
-          eval `ssh-agent -s`
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 700 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.EC2_PRIVATE_IP_1 }} >> ~/.ssh/known_hosts
-          ssh-add ~/.ssh/id_ed25519
+        uses: actions/checkout@v2
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -46,13 +34,40 @@ jobs:
           echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > .vault_pass
           ansible-vault decrypt ansible/secrets.yml --vault-password-file .vault_pass
 
+      - name: Check EC2_PRIVATE_IP_1 secret
+        run: |
+          if [ -z "${{ secrets.EC2_PRIVATE_IP_1 }}" ]; then
+            echo "EC2_PRIVATE_IP_1 secret is empty or not set"
+            exit 1
+          else
+            echo "EC2_PRIVATE_IP_1 is set (value not shown for security reasons)"
+          fi
+
+      - name: Add SSH key
+        run: |
+          set -x
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_ed25519_temp
+          chmod 700 ~/.ssh/id_ed25519_temp
+          ssh-keygen -p -f ~/.ssh/id_ed25519_temp -m pem -N "" || echo "ssh-keygen failed"
+          mv ~/.ssh/id_ed25519_temp ~/.ssh/id_ed25519
+          chmod 700 ~/.ssh/id_ed25519
+          ls -l ~/.ssh/id_ed25519
+          if ! ssh-keyscan -H "${{ secrets.EC2_PRIVATE_IP_1 }}" >> ~/.ssh/known_hosts 2>&1; then
+            echo "ssh-keyscan failed. Error output:"
+            ssh-keyscan -H "${{ secrets.EC2_PRIVATE_IP_1 }}" 2>&1
+            exit 1
+          fi
+          cat ~/.ssh/known_hosts
+        shell: bash
+
       - name: Test SSH connection
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PRIVATE_IP_1 }} echo "SSH connection successful"
 
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i inventory ansible/playbook.yml --vault-password-file .vault_pass -e "ansible_ssh_private_key_file=~/.ssh/id_ed25519" -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no'" -vvv
+          ansible-playbook -i inventory ansible/playbook.yml --vault-password-file .vault_pass
 
       - name: Cleanup
         if: always()
