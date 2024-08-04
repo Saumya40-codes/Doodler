@@ -1,4 +1,5 @@
 name: Run Ansible Configurations
+
 on:
   push:
     branches:
@@ -6,9 +7,11 @@ on:
     paths:
       - 'server/**'
       - '.github/workflows/run-ansible-configs.yml'
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -35,15 +38,11 @@ jobs:
 
       - name: Add SSH key
         run: |
-          set -x
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_ed25519_temp
-          chmod 600 ~/.ssh/id_ed25519_temp
-          ssh-keygen -p -f ~/.ssh/id_ed25519_temp -m pem -N ""
-          mv ~/.ssh/id_ed25519_temp ~/.ssh/id_ed25519
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ls -l ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.EC2_PRIVATE_IP_1 }} >> ~/.ssh/known_hosts
+          ls -l ~/.ssh/id_ed25519
           cat ~/.ssh/known_hosts
         shell: bash
 
