@@ -29,7 +29,6 @@ io.on('connection', (socket) => {
         socket.join(roomId);
         socket.handshake.query = { roomId, username };
 
-        // io.to(roomId).emit('user-connected-to-room', username);
         io.to(roomId).emit('user-connected', username);
     });
 
