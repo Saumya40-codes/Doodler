@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doodler-deployment
+  labels:
+    app: doodler
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: doodler
+  template:
+    metadata:
+      labels:
+        app: doodler
+    spec:
+      containers:
+        - name: doodler-server
+          image: saumyashah40/doodler-server:latest
+          ports:
+            - containerPort: 5000  
