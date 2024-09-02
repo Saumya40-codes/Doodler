@@ -1,42 +1,56 @@
 # Doodler
 
-A Next.js and Socket.io-based canvas of creativity, Doodler lets you craft your own rooms, join friends with unique IDs, or mingle in public random rooms. Chat and draw in real-time all together.
+**Doodler** is an interactive canvas of creativity built with Next.js and Socket.io. It enables you to create personalized rooms, join friends using unique IDs, or dive into public random rooms. Engage in real-time collaboration through drawing and chat, making each session fun and dynamic.
 
-### Demo
-
-
-https://github.com/Saumya40-codes/Doodler/assets/115284013/31be787d-778a-4c96-ab6c-1aa45329b107
+### 🚀 Quick Demo
 
 
-----
-### Features:
+https://github.com/user-attachments/assets/985946c4-cac6-4fe0-ab36-d8550a5d45c3
 
-- Room Creation:
-  - Users can create personalized rooms.
+---
+
+### 🎨 Key Features:
+
+- **Room Creation:**  
+  Create your own customizable rooms and invite others to join.
   
-- Friend's Room Joining:
-  - Join friends' rooms using unique room IDs.
+- **Join Friends' Rooms:**  
+  Easily connect with friends using unique room IDs for private collaboration.
     
-- Public Random Rooms:
-  - Join public random rooms for spontaneous collaboration.
+- **Public Random Rooms:**  
+  Spontaneously connect with others by joining public rooms for open creativity.
     
-- Private Rooms:
-  - No random user can join and other than the owner, people with ids can only join
- 
- - Real-time Chat:
-   - Seamless chat functionality within each room.
-     
-- Collaborative Drawing:
-  - Users can draw together in real-time.
+- **Private Rooms:**  
+  Ensure privacy—only users with specific IDs can access private rooms, with full control by the owner.
+  
+- **Real-time Chat:**  
+  Engage in instant messaging with everyone in your room for seamless collaboration.
     
-- Keep track of which user joined or left
+- **Collaborative Drawing:**  
+  Draw together in real-time, creating shared artwork and designs.
+    
+- **User Presence Tracking:**  
+  Get instant notifications when a user joins or leaves your room, keeping you informed of active participants.
 
-----
+---
 
-### Tech Stack
-- Typescript
-- Nextjs
-- ChakraUI
-- socket.io
-- Express
-- MongoDB
+### 🛠️ Tech Stack
+
+- **TypeScript**
+- **Next.js**
+- **Chakra UI**
+- **Socket.io**
+- **Express**
+- **MongoDB**
+
+---
+
+### ⚙️ Additional Features
+
+- **Automated Server Configuration on AWS EC2:**  
+  With Ansible, automate the setup of Nginx, SSL, Node.js, and PM2 for enhanced scalability and performance.
+  
+- **Kubernetes Integration:**  
+  Deploy and manage Doodler using Kubernetes Pods, Deployments, and Services.  
+  Check out the [Kubernetes configuration files](https://github.com/Saumya40-codes/Doodler/tree/master/server/kubernetes-config) for further details.
+
