@@ -4,6 +4,8 @@
 
 ### 🚀 Quick Demo
 
+**Please 🐻 with website on production taking long time to respond to your *clicks*, this project's API is deployed on render and due to bit inactivity, it goes to long sleep (lamba functions ugh!))**
+
 
 https://github.com/user-attachments/assets/985946c4-cac6-4fe0-ab36-d8550a5d45c3
 
