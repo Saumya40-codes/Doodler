@@ -9,6 +9,10 @@ variable "ami_id" {
   type        = string
 }
 
+variable "subnet_id" {
+  description = "Id of the subnet to keep this EC2 instance in."
+}
+
 output "public_ip_1" {
   description = "IP of EC2 instance 1 based on environment"
   value       = aws_instance.instance1.public_ip
