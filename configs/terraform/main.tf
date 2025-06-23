@@ -1,36 +1,17 @@
-variable "instance_type" {
-  description = "EC2 instance type"
-  type        = string
-  default     = "t2.micro"
-}
-
-variable "ami_id" {
-  description = "EC2 AMI ID"
-  type        = string
-}
-
 provider "aws" {
   region = "ap-south-1"
 }
 
-resource "aws_instance" "instance1" {
-  ami           = var.ami_id
-  instance_type = var.instance_type
-  key_name      = "my-key"
+variable "ami_val" {
+  description = "AMI ID value"
 }
 
-resource "aws_instance" "instance2" {
-  ami           = var.ami_id
-  instance_type = var.instance_type
-  key_name      = "my-key"
+variable "instance_type_val" {
+  description = "Type of EC2 instance"
 }
 
-output "public_ip_1" {
-  description = "IP of EC2 instance 1 based on environment"
-  value       = aws_instance.example.public_ip
-}
-
-output "public_ip_2" {
-  description = "IP of EC2 instance 2 based on environment"
-  value       = aws_instance.example2.public_ip
+module "ec2_instance" {
+  source = "./modules/ec2_instance"
+  ami_id = var.ami_val
+  instance_type = var.instance_type_val
 }

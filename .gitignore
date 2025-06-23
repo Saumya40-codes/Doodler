@@ -35,3 +35,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Terraform state files
+*.tfstate
+*.tfstate.backup
+
+# Sensitive variable files
+*.tfvars
+
+# Terraform plan outputs
+*.tfplan
+
+.terraform/
